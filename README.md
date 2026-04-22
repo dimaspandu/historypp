@@ -335,7 +335,7 @@ Defines a terminal route in navigation flow.
 
 ### Programmatic Navigation (Sequence Diagram)
 
-![Push Replace Sequence](docs/diagrams/push_navigation-sequence-diagram.png)
+![Push Replace Sequence](docs/diagrams/push_replace-navigation-sequence-diagram.png)
 
 ---
 
