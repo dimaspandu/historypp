@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bottom Sheet (State Driven)</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    button {
+      padding: 10px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* overlay */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 300ms;
+    }
+
+    #overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* bottom sheet */
+    #sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 300px;
+      background: white;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      transform: translateY(100%);
+      transition: transform 300ms;
+      padding: 20px;
+    }
+
+    #sheet.active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Bottom Sheet (State-driven Routing)</h1>
+
+  <button id="open">Open Details</button>
+
+  <div id="overlay"></div>
+
+  <div id="sheet">
+    <h2>Details</h2>
+    <p>This is a bottom sheet.</p>
+    <button id="close">Close</button>
+  </div>
+
+  <script src="../../src/index.js"></script>
+  <script>
+    const sheet = document.getElementById("sheet");
+    const overlay = document.getElementById("overlay");
+    const openBtn = document.getElementById("open");
+    const closeBtn = document.getElementById("close");
+
+    // Configure router
+    history.config({
+      base: "/examples/07-bottom-sheet",
+      mode: "history"
+    });
+
+    // ==============================
+    // UI Helpers
+    // ==============================
+
+    function openSheet() {
+      overlay.classList.add("active");
+      sheet.classList.add("active");
+    }
+
+    function closeSheet() {
+      overlay.classList.remove("active");
+      sheet.classList.remove("active");
+    }
+
+    // ==============================
+    // ROUTES (STATE-DRIVEN)
+    // ==============================
+
+    // Root route represents "no sheet"
+    history.router("/", {
+      onMeet() {
+        closeSheet();
+      }
+    });
+
+    // Details route represents "sheet open"
+    history.router("/details", {
+      onMeet() {
+        openSheet();
+      }
+    });
+
+    // ==============================
+    // USER ACTIONS
+    // ==============================
+
+    openBtn.onclick = () => {
+      history.navigatePush("/details");
+    };
+
+    closeBtn.onclick = () => {
+      history.navigatePop();
+    };
+
+    overlay.onclick = () => {
+      history.navigatePop();
+    };
+
+    // ==============================
+    // INITIAL SYNC
+    // ==============================
+
+    // Important:
+    // Normalize current URL into router system
+    history.navigateReplace(location.pathname + location.search);
+  </script>
+</body>
+</html>

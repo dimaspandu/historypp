@@ -17,13 +17,68 @@ The router acts purely as an orchestration layer and does not handle rendering.
 
 ---
 
+## Getting Started
+
+### Run Local Server
+
+This project includes a simple Node.js static server for running examples.
+
+```bash
+node server.js
+```
+
+Then open in your browser:
+
+```text
+http://localhost:5173
+```
+
+---
+
+### Why a Server is Required
+
+When using **history mode**, the browser relies on the History API (`pushState`, `replaceState`).
+
+Opening files directly using:
+
+```text
+file://...
+```
+
+will break routing behavior.
+
+---
+
+### Alternative (No Server)
+
+If you cannot run a server, switch to hash mode:
+
+```js
+history.config({
+  mode: "hash"
+});
+```
+
+---
+
+## Examples
+
+Available examples:
+
+* `/examples/01-basic-routing`
+* `/examples/07-bottom-sheet`
+
+More examples are included as scaffolding and will be expanded.
+
+---
+
 ## Routing Mode
 
 This system supports two routing modes:
 
 ### History Mode (default)
 
-```text
+```
 /about
 ```
 
@@ -31,14 +86,18 @@ Uses the native History API (`pushState`, `replaceState`, `popstate`).
 
 Requirements:
 
-* Server must be configured to always return the entry HTML file (e.g. `index.html`)
-* Direct access or reload on nested routes must be handled by the server
+Depends on application architecture:
+
+* Single-entry (SPA): server should return a single HTML entry (e.g. `index.html`)
+* Multi-entry / SSR: each route can return its own HTML document
+
+Direct access or reload on nested routes must be handled accordingly by the server.
 
 ---
 
 ### Hash Mode
 
-```text
+```
 /#/about
 ```
 
@@ -64,29 +123,109 @@ history.config({
 
 ### Behavior
 
+Navigation paths are normalized and resolved through the internal path layer.
+
 | Method                    | History Mode    | Hash Mode         |
 | ------------------------- | --------------- | ----------------- |
-| navigatePush("/about")    | /about          | /#/about          |
-| navigateReplace("/about") | /about          | /#/about          |
+| navigatePush("/about")    | base + "/about" | /#/about          |
+| navigateReplace("/about") | base + "/about" | /#/about          |
 | navigatePop()             | uses `popstate` | uses `hashchange` |
 
-In hash mode, the router automatically prefixes paths with `#`.
+Example (with base = "/app"):
+
+```
+navigatePush("/about") → /app/about
+```
+
+Notes:
+
+* In history mode, `base` is automatically prefixed if configured
+* In hash mode, paths are converted to `/#/path`
+* Query strings are preserved (e.g. `/about?tab=1`)
 
 ---
 
-### Path Resolution
+## Path Resolution
 
-The router internally normalizes paths:
+The router uses a centralized path handling layer that ensures consistent behavior across modes.
 
-* History mode → `location.pathname`
-* Hash mode → `location.hash.slice(1)`
+Internally, the following steps are applied:
+
+1. Normalize path (ensure leading `/`, remove invalid prefixes)
+2. Apply or strip `base` depending on direction
+3. Extract query parameters into `ctx.query`
+4. Match normalized path against registered routes
+
+Mode-specific behavior:
+
+* History mode → uses `location.pathname + location.search`
+* Hash mode → uses `location.hash` (without `#`)
+
+Example:
+
+```
+URL: /examples/01-basic-routing/about?tab=1
+
+Resolved:
+path  = /about
+query = { tab: "1" }
+```
 
 ---
 
-### Recommendation
+## Recommendation
 
 * Use history mode when server configuration is available
 * Use hash mode for static or file-based environments
+
+---
+
+## Base Path
+
+In multi-entry or nested environments (e.g. running applications under subdirectories like `/examples/...`), the router can be configured with a base path.
+
+### Configuration
+
+```js
+history.config({
+  base: "/examples/01-basic-routing"
+});
+```
+
+### Behavior
+
+The base path is:
+
+* Prefixed to all navigation URLs
+* Stripped before route matching
+
+Example:
+
+```
+URL:        /examples/01-basic-routing/about
+Base:       /examples/01-basic-routing
+Route path: /about
+```
+
+### Use Cases
+
+* Running multiple router instances under different paths
+* Serving examples from subdirectories
+* Embedding applications inside larger sites
+
+---
+
+## Path Handling Principles
+
+The router is built around a centralized path abstraction layer.
+
+Key principles:
+
+* Paths are always normalized (must start with `/`)
+* Base path is transparent to route definitions
+* Query strings are preserved and exposed via `ctx.query`
+* Supports both history and hash modes consistently
+* Accepts both relative and absolute input paths
 
 ---
 
@@ -157,7 +296,7 @@ history.router("/about", (ctx) => {
 });
 ```
 
-A function handler is internally mapped to:
+Internally mapped to:
 
 ```js
 { onMeet: handler }
@@ -213,15 +352,27 @@ All hooks default to no-op if not defined.
 
 ```js
 {
-  path,
-  params,
-  query,
+  path,    // normalized path (without base)
+  params,  // dynamic route params
+  query,   // parsed query object
   state,
   from,
   to,
-  type
+  type     // push | replace | pop
 }
 ```
+
+### Query Example
+
+```js
+history.navigatePush("/about?tab=1");
+
+history.router("/about", (ctx) => {
+  console.log(ctx.query.tab); // "1"
+});
+```
+
+---
 
 ### Dynamic Parameters
 
@@ -357,14 +508,16 @@ Defines a terminal route in navigation flow.
 
 ```js
 document.addEventListener("click", (e) => {
-  const a = e.target.closest("a");
+  const a = e.target.closest("a[data-link]");
   if (!a) return;
 
   const url = new URL(a.href);
-  if (url.origin === location.origin) {
-    e.preventDefault();
-    history.navigatePush(url.pathname);
-  }
+
+  if (url.origin !== location.origin) return;
+
+  e.preventDefault();
+
+  history.navigatePush(url.pathname + url.search);
 });
 ```
 
@@ -376,13 +529,13 @@ Server behavior depends on the application architecture:
 
 #### Single-entry (SPA)
 
-All routes should resolve to a single HTML entry file (e.g. `index.html`):
+All routes should resolve to a single HTML entry file:
 
-```text
+```
 /about → index.html
 ```
 
-This approach requires server-side fallback configuration so that direct access or reload on nested routes works correctly.
+Requires server-side fallback configuration.
 
 ---
 
@@ -390,12 +543,12 @@ This approach requires server-side fallback configuration so that direct access 
 
 Each route may return its own HTML document:
 
-```text
+```
 /       → index.html
 /about  → about.html
 ```
 
-In this model, the router acts as a client-side orchestration and enhancement layer on top of server-rendered content.
+The router acts as a client-side orchestration layer on top of server-rendered content.
 
 ---
 
@@ -407,7 +560,7 @@ If `state` is not provided:
 history.state === null
 ```
 
-It is recommended to normalize to an empty object in the router.
+It is recommended to normalize it to an empty object in the router implementation.
 
 ---
 

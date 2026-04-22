@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Basic Routing</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    nav a { margin-right: 10px; cursor: pointer; color: blue; }
+    #view { margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <h1>Basic Routing</h1>
+
+  <nav>
+    <a href="/" data-link>Home</a>
+    <a href="/about" data-link>About</a>
+  </nav>
+
+  <div id="view"></div>
+
+  <script src="../../src/index.js"></script>
+  <script>
+    const view = document.getElementById("view");
+
+    /**
+     * Configure router.
+     *
+     * base:
+     *   Required when running under subdirectory (e.g. /examples/01-basic-routing)
+     *
+     * mode:
+     *   "history" → clean URLs, requires server support
+     *   "hash"    → works without server fallback
+     */
+    history.config({
+      base: "/examples/01-basic-routing",
+      mode: "history"
+    });
+
+    /**
+     * Intercept link clicks and convert them into SPA navigation.
+     * Prevents full page reload.
+     */
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest("[data-link]");
+      if (!a) return;
+
+      e.preventDefault();
+
+      const href = a.getAttribute("href");
+      history.navigatePush(href);
+    });
+
+    /**
+     * Root route
+     */
+    history.router("/", {
+      onMeet() {
+        view.innerHTML = `
+          <h2>Home</h2>
+          <p>Welcome home</p>
+        `;
+      }
+    });
+
+    /**
+     * About route
+     */
+    history.router("/about", {
+      onMeet() {
+        view.innerHTML = `
+          <h2>About</h2>
+          <p>About page</p>
+        `;
+      }
+    });
+
+    /**
+     * Initial route synchronization.
+     *
+     * Important:
+     * - Converts current URL into router state
+     * - Must include pathname + search for query support
+     * - Base path will be stripped internally
+     */
+    history.navigateReplace(location.pathname + location.search);
+  </script>
+</body>
+</html>
