@@ -1,19 +1,22 @@
 # History++ (SPA Navigation Engine)
 
-A lightweight, UI-agnostic navigation engine built on top of the native History API. This project extends `window.history` with structured routing, lifecycle control, and navigation orchestration without introducing external dependencies.
+A lightweight, UI-agnostic navigation engine built on top of the native History API.
+
+It extends `window.history` with structured routing, direction-aware lifecycle hooks, and navigation orchestration without external dependencies.
 
 ---
 
 ## Overview
 
-This system enhances the native browser navigation model while preserving its behavior:
+This router keeps browser-native navigation behavior intact while adding a predictable route lifecycle:
 
 * No page reloads
 * Native back/forward support
 * URL-driven state
 * History stack integrity
+* Route lifecycle that changes based on navigation direction
 
-The router acts purely as an orchestration layer and does not handle rendering.
+The router acts as an orchestration layer and does not handle rendering for you.
 
 ---
 
@@ -21,31 +24,49 @@ The router acts purely as an orchestration layer and does not handle rendering.
 
 ### Run Local Server
 
-This project includes a simple Node.js static server for running examples.
+This project includes a minimal Node.js server for running the examples:
 
 ```bash
 node server.js
 ```
 
-Then open in your browser:
+Then open:
 
 ```text
 http://localhost:5173
 ```
 
+The server opens the examples index by default.
+
 ---
 
-### Why a Server is Required
+### Smart Example Routing
 
-When using **history mode**, the browser relies on the History API (`pushState`, `replaceState`).
+The built-in server resolves nested example routes automatically by finding the nearest matching `index.html`.
 
-Opening files directly using:
+Examples:
+
+```text
+/examples/01-basic-routing/about
+/examples/02-dynamic-params/user/1
+/examples/03-lifecycle-visualizer/contact
+```
+
+This makes the lifecycle and dynamic-param demos work in `history` mode without extra server setup.
+
+---
+
+### Why a Server Is Required
+
+When using `history` mode, the browser relies on `pushState`, `replaceState`, and direct URL access.
+
+Opening files directly with:
 
 ```text
 file://...
 ```
 
-will break routing behavior.
+will break route resolution.
 
 ---
 
@@ -54,35 +75,31 @@ will break routing behavior.
 If you cannot run a server, switch to hash mode:
 
 ```js
-history.config({
-  mode: "hash"
-});
+history.config({ mode: "hash" });
 ```
 
 ---
 
 ## Examples
 
-Open the example index after starting the local server:
+Open the examples index:
 
 ```text
 http://localhost:5173/examples/
 ```
 
-Currently available interactive examples:
+Available demos:
 
-* `/examples/01-basic-routing` - route registration and programmatic navigation
-* `/examples/02-dynamic-params` - dynamic path segments such as `/article/:id`
-* `/examples/03-lifecycle-visualizer` - route lifecycle transitions and state changes
-* `/examples/07-bottom-sheet` - bottom-sheet style navigation flow
+* `/examples/01-basic-routing` - basic route registration and route switching
+* `/examples/02-dynamic-params` - dynamic path segments such as `/user/:id`
+* `/examples/03-lifecycle-visualizer` - visualizes the full lifecycle flow for push, replace, and pop
+* `/examples/07-bottom-sheet` - route-driven bottom-sheet interaction
 
-Additional example directories already exist as scaffolding for future scenarios.
+More scenario folders already exist under `examples/` as scaffolding.
 
 ---
 
-## Routing Mode
-
-This system supports two routing modes:
+## Routing Modes
 
 ### History Mode (default)
 
@@ -90,18 +107,7 @@ This system supports two routing modes:
 /about
 ```
 
-Uses the native History API (`pushState`, `replaceState`, `popstate`).
-
-Requirements:
-
-Depends on application architecture:
-
-* Single-entry (SPA): server should return a single HTML entry (e.g. `index.html`)
-* Multi-entry / SSR: each route can return its own HTML document
-
-Direct access or reload on nested routes must be handled accordingly by the server.
-
----
+Uses the native History API and works best when the server can resolve nested routes.
 
 ### Hash Mode
 
@@ -109,476 +115,247 @@ Direct access or reload on nested routes must be handled accordingly by the serv
 /#/about
 ```
 
-Uses the URL hash (`location.hash`, `hashchange`) and does not require server configuration.
-
-Works in:
-
-* static hosting
-* local files (`file://`)
-* environments without server fallback
-
----
+Uses `location.hash` and works without server-side route handling.
 
 ### Configuration
 
 ```js
 history.config({
-  mode: "history" // or "hash"
-});
-```
-
----
-
-### Behavior
-
-Navigation paths are normalized and resolved through the internal path layer.
-
-| Method                    | History Mode    | Hash Mode         |
-| ------------------------- | --------------- | ----------------- |
-| navigatePush("/about")    | base + "/about" | /#/about          |
-| navigateReplace("/about") | base + "/about" | /#/about          |
-| navigatePop()             | uses `popstate` | uses `hashchange` |
-
-Example (with base = "/app"):
-
-```text
-navigatePush("/about") -> /app/about
-```
-
-Notes:
-
-* In history mode, `base` is automatically prefixed if configured
-* In hash mode, paths are converted to `/#/path`
-* Query strings are preserved (e.g. `/about?tab=1`)
-
----
-
-## Path Resolution
-
-The router uses a centralized path handling layer that ensures consistent behavior across modes.
-
-Internally, the following steps are applied:
-
-1. Normalize path (ensure leading `/`, remove invalid prefixes)
-2. Apply or strip `base` depending on direction
-3. Extract query parameters into `ctx.query`
-4. Match normalized path against registered routes
-
-Mode-specific behavior:
-
-* History mode -> uses `location.pathname + location.search`
-* Hash mode -> uses `location.hash` (without `#`)
-
-Example:
-
-```text
-URL: /examples/01-basic-routing/about?tab=1
-
-Resolved:
-path  = /about
-query = { tab: "1" }
-```
-
----
-
-## Recommendation
-
-* Use history mode when server configuration is available
-* Use hash mode for static or file-based environments
-
----
-
-## Base Path
-
-In multi-entry or nested environments (e.g. running applications under subdirectories like `/examples/...`), the router can be configured with a base path.
-
-### Configuration
-
-```js
-history.config({
+  mode: "history", // or "hash"
   base: "/examples/01-basic-routing"
 });
 ```
-
-### Behavior
-
-The base path is:
-
-* Prefixed to all navigation URLs
-* Stripped before route matching
-
-Example:
-
-```text
-URL:        /examples/01-basic-routing/about
-Base:       /examples/01-basic-routing
-Route path: /about
-```
-
-### Use Cases
-
-* Running multiple router instances under different paths
-* Serving examples from subdirectories
-* Embedding applications inside larger sites
-
----
-
-## Path Handling Principles
-
-The router is built around a centralized path abstraction layer.
-
-Key principles:
-
-* Paths are always normalized (must start with `/`)
-* Base path is transparent to route definitions
-* Query strings are preserved and exposed via `ctx.query`
-* Supports both history and hash modes consistently
-* Accepts both relative and absolute input paths
 
 ---
 
 ## Core API
 
 ```js
+history.config(options)
 history.router(path, handler?)
 history.navigatePush(path, state?)
 history.navigateReplace(path, state?)
 history.navigatePop()
-
-history.use(middleware)
-history.block(blocker)
-history.notFound(handler)
 ```
 
 ---
 
-## Navigation Methods
-
-All navigation methods are built on top of the native History API and do not trigger page reloads.
-
-### navigatePush
+## Basic Usage
 
 ```js
-history.navigatePush("/about", { from: "home" });
-```
-
-* Uses `pushState`
-* Adds a new history entry
-* Updates URL
-* Triggers router execution
-
----
-
-### navigateReplace
-
-```js
-history.navigateReplace("/login");
-```
-
-* Uses `replaceState`
-* Replaces current history entry
-* Updates URL
-* Triggers router execution
-
----
-
-### navigatePop
-
-```js
-history.navigatePop();
-```
-
-* Uses `history.back()`
-* Relies on `popstate` event
-* Router execution is triggered by the event
-
----
-
-## Route Definition
-
-### Function Style
-
-```js
-history.router("/about", (ctx) => {
-  console.log("About page");
+history.config({
+  base: "/examples/01-basic-routing",
+  mode: "history"
 });
-```
 
-Internally mapped to:
-
-```js
-{ onMeet: handler }
-```
-
----
-
-### Object Style
-
-```js
-history.router("/user/:id", {
-  onMeet(ctx) {},
-  onArrive(ctx) {},
-  onExit(ctx) {},
-  onComeback(ctx) {},
-  canLeave(ctx) { return true; },
-  end: true
+history.router("/", {
+  onMeet() {
+    console.log("Home");
+  }
 });
+
+history.router("/about", {
+  onMeet() {
+    console.log("About");
+  }
+});
+
+history.navigateReplace(location.pathname + location.search);
 ```
+
+The last line is important for syncing the current URL into the router on first load.
 
 ---
 
-### Chaining Style
+## Lifecycle Model
 
-```js
-history
-  .router("/user/:id")
-  .onMeet(ctx => {})
-  .onExit(ctx => {})
-  .canLeave(ctx => true)
-  .end(true)
-  .done();
+The router is lifecycle-driven and direction-aware.
+
+### Push / Replace
+
+```text
+current -> onExit
+next    -> onArrive -> onMeet
 ```
 
-All styles are normalized into a lifecycle object internally.
+### Pop (Back / Forward)
+
+```text
+current -> onReturn -> onExit
+next    -> onComeback -> onMeet
+```
+
+This means the route being left and the route being entered can react differently depending on whether navigation was initiated programmatically or via browser history.
 
 ---
 
 ## Lifecycle Hooks
 
-| Hook       | Description                             |
-| ---------- | --------------------------------------- |
-| onMeet     | Runs every time route becomes active    |
-| onArrive   | Runs only on first entry                |
-| onExit     | Runs before leaving the route           |
-| onComeback | Runs when returning via back navigation |
+| Hook       | When it runs |
+| ---------- | ------------ |
+| `onMeet` | Every time the route becomes active |
+| `onArrive` | When entering through `navigatePush()` or `navigateReplace()` |
+| `onExit` | Right before leaving the current route |
+| `onReturn` | Right before leaving the current route because of back/forward navigation |
+| `onComeback` | When a route becomes active again through back/forward navigation |
 
-All hooks default to no-op if not defined.
+All hooks are optional.
 
----
-
-## Context Object (ctx)
-
-```js
-{
-  path,    // normalized path (without base)
-  params,  // dynamic route params
-  query,   // parsed query object
-  state,
-  from,
-  to,
-  type     // push | replace | pop
-}
-```
-
-### Query Example
+### Example
 
 ```js
-history.navigatePush("/about?tab=1");
-
-history.router("/about", (ctx) => {
-  console.log(ctx.query.tab); // "1"
-});
-```
-
----
-
-### Dynamic Parameters
-
-```js
-history.router("/article/:id", (ctx) => {
-  console.log(ctx.params.id);
-});
-
-history.navigatePush("/article/9");
-```
-
-Result:
-
-```js
-ctx.params = { id: "9" };
-```
-
-Notes:
-
-* Parameters are strings
-* Static routes take priority over dynamic
-
----
-
-## Middleware
-
-```js
-history.use(async (ctx, next) => {
-  await next();
-});
-```
-
-Execution order:
-
-1. Middleware (before)
-2. Lifecycle
-3. Middleware (after)
-
----
-
-## Guards and Blocking
-
-### Understanding `canLeave`
-
-`canLeave` is evaluated on the **current (active) route**, not the target route.
-
-It answers the question:
-
-```text
-Is the current route allowed to be exited?
-```
-
-This check is performed for every navigation attempt:
-
-* navigatePush
-* navigateReplace
-* browser back/forward (popstate)
-
-Flow perspective:
-
-```text
-[current route] --(canLeave?)--> [next route]
-```
-
-If `canLeave` returns `false`, navigation is cancelled before any lifecycle of the next route runs.
-
-Relation to lifecycle:
-
-* `canLeave` -> decision (guard)
-* `onExit` -> side effect (executed after allowed)
-
----
-
-### Global Blocker
-
-```js
-history.block(() => false);
-```
-
-### Route-level Guard
-
-```js
-history.router("/form", {
-  canLeave() {
-    return false;
+history.router("/profile/:id", {
+  onArrive(ctx) {
+    console.log("Fresh arrival", ctx.params.id);
+  },
+  onMeet(ctx) {
+    console.log("Always active", ctx.path);
+  },
+  onExit(ctx) {
+    console.log("Leaving", ctx.from, "->", ctx.to);
+  },
+  onReturn(ctx) {
+    console.log("Leaving because of pop", ctx.path);
+  },
+  onComeback(ctx) {
+    console.log("Returned via browser history", ctx.path);
   }
 });
 ```
 
 ---
 
-## End Route
+## Context Object (`ctx`)
+
+Each lifecycle hook receives:
 
 ```js
-history.router("/success", {
-  end: true
+{
+  path,   // normalized matched path, without base
+  params, // dynamic params
+  query,  // parsed query string object
+  state,
+  from,   // previous route path
+  to,     // target route path
+  type    // "push" | "replace" | "pop"
+}
+```
+
+Useful details:
+
+* `ctx.params` is filled when the route contains dynamic segments
+* `ctx.query` is parsed from the URL search string
+* `ctx.type` tells you whether the transition came from push, replace, or pop
+
+---
+
+## Dynamic Params
+
+```js
+history.router("/user/:id", {
+  onMeet(ctx) {
+    console.log(ctx.params.id);
+  }
 });
 ```
 
-Defines a terminal route in navigation flow.
+Example:
+
+```js
+history.navigatePush("/user/42");
+// ctx.params.id === "42"
+```
+
+Static routes are matched before dynamic ones with the same shape.
+
+---
+
+## Path Handling
+
+The router resolves paths through a small internal path layer:
+
+* Ensures every path starts with `/`
+* Removes accidental leading `#`
+* Applies `base` when building URLs
+* Strips `base` before route matching
+* Parses query strings into `ctx.query`
+* Supports both `history` and `hash` modes consistently
+
+Example with `base: "/examples/02-dynamic-params"`:
+
+```text
+Browser URL: /examples/02-dynamic-params/user/7?tab=info
+Matched path: /user/7
+ctx.query: { tab: "info" }
+```
+
+---
+
+## Guards (`canLeave`)
+
+```js
+history.router("/form", {
+  canLeave(ctx) {
+    return confirm("Leave this page?");
+  }
+});
+```
+
+Behavior:
+
+* Evaluated on the current active route
+* Applies to `push`, `replace`, and `pop`
+* If a `pop` navigation is blocked, the router restores the current URL automatically
 
 ---
 
 ## Execution Flow
 
-### Programmatic Navigation (Activity Diagram)
-
-![Push Replace Activity](docs/diagrams/push_replace-navigation-activity-diagram.png)
+The diagrams in `docs/diagrams/` describe the high-level navigation flow for push/replace and back navigation.
 
 ---
 
-### Programmatic Navigation (Sequence Diagram)
-
-![Push Replace Sequence](docs/diagrams/push_replace-navigation-sequence-diagram.png)
-
----
-
-### Back Navigation (Activity Diagram)
-
-![Back Activity](docs/diagrams/back-navigation-activity-diagram.png)
-
----
-
-### Back Navigation (Sequence Diagram)
-
-![Back Sequence](docs/diagrams/back-navigation-sequence-diagram.png)
-
----
-
-## Production Considerations
+## Production Notes
 
 ### Link Interception
 
 ```js
 document.addEventListener("click", (e) => {
-  const a = e.target.closest("a[data-link]");
+  const a = e.target.closest("[data-link]");
   if (!a) return;
 
   const url = new URL(a.href);
-
   if (url.origin !== location.origin) return;
 
   e.preventDefault();
-
   history.navigatePush(url.pathname + url.search);
 });
 ```
 
----
+### Server Strategy
 
-### Server Handling
-
-Server behavior depends on the application architecture:
-
-#### Single-entry (SPA)
-
-All routes should resolve to a single HTML entry file:
+Single-entry SPA:
 
 ```text
 /about -> index.html
 ```
 
-Requires server-side fallback configuration.
-
----
-
-#### Multi-entry / SSR
-
-Each route may return its own HTML document:
+Multi-entry or SSR:
 
 ```text
 /       -> index.html
 /about  -> about.html
 ```
 
-The router acts as a client-side orchestration layer on top of server-rendered content.
-
----
-
-### State Handling
-
-If `state` is not provided:
-
-```js
-history.state === null
-```
-
-It is recommended to normalize it to an empty object in the router implementation.
-
 ---
 
 ## Design Principles
 
-1. Router acts as orchestration layer
-2. No dependency on UI or rendering
-3. Lifecycle-driven navigation
-4. Native browser behavior is preserved
-5. Extends History API semantics rather than replacing them
+1. Router is an orchestration layer
+2. URL is the source of truth
+3. Routes describe UI state, not transitions
+4. Lifecycle drives behavior
+5. Native browser behavior is preserved
 
 ---
 

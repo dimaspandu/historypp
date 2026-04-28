@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Lifecycle Visualizer</title>
+  <title>Lifecycle Visualizer (Full)</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
 
@@ -14,27 +14,48 @@
 
     #log {
       margin-top: 20px;
-      padding: 10px;
+      padding: 12px;
       border: 1px solid #ddd;
-      height: 200px;
+      height: 260px;
       overflow-y: auto;
       background: #fafafa;
       font-family: monospace;
       font-size: 13px;
     }
 
-    .item {
-      margin-bottom: 4px;
+    .item { margin-bottom: 6px; }
+
+    .time { color: #999; margin-right: 6px; }
+
+    .route { font-weight: bold; }
+
+    /* lifecycle colors */
+    .onMeet { color: #2e7d32; }
+    .onArrive { color: #1565c0; }
+    .onExit { color: #c62828; }
+    .onReturn { color: #ef6c00; }
+    .onComeback { color: #6a1b9a; }
+
+    .type {
+      margin-left: 6px;
+      color: #555;
+      font-size: 11px;
     }
 
-    .route {
-      font-weight: bold;
+    .controls {
+      margin-top: 10px;
+    }
+
+    button {
+      margin-right: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <h1>Lifecycle Visualizer</h1>
+  <h1>Lifecycle Visualizer (Full)</h1>
 
   <nav>
     <a href="/" data-link>Home</a>
@@ -42,11 +63,16 @@
     <a href="/contact" data-link>Contact</a>
   </nav>
 
+  <div class="controls">
+    <button id="clear">Clear Log</button>
+  </div>
+
   <div id="log"></div>
 
   <script src="../../src/index.js"></script>
   <script>
     const logEl = document.getElementById("log");
+    const clearBtn = document.getElementById("clear");
 
     // ==============================
     // CONFIG
@@ -58,13 +84,28 @@
     });
 
     // ==============================
-    // LOGGER
+    // LOGGER (timeline)
     // ==============================
 
-    function log(message) {
+    let step = 0;
+
+    function now() {
+      return new Date().toLocaleTimeString();
+    }
+
+    function log(route, hook, ctx) {
+      step++;
+
       const el = document.createElement("div");
       el.className = "item";
-      el.innerHTML = message;
+
+      el.innerHTML = `
+        <span class="time">#${step} ${now()}</span>
+        <span class="route">${route}</span>
+        →
+        <span class="${hook}">${hook}</span>
+        <span class="type">(type: ${ctx.type})</span>
+      `;
 
       logEl.appendChild(el);
       logEl.scrollTop = logEl.scrollHeight;
@@ -72,7 +113,10 @@
 
     function clearLog() {
       logEl.innerHTML = "";
+      step = 0;
     }
+
+    clearBtn.onclick = clearLog;
 
     // ==============================
     // LINK INTERCEPTION
@@ -90,26 +134,32 @@
     });
 
     // ==============================
-    // ROUTES
+    // ROUTE FACTORY
     // ==============================
 
     function createRoute(name) {
       return {
-        onMeet(ctx) {
-          log(`
-            <span class="route">${name}</span> → onMeet
-            <small>(type: ${ctx.type})</small>
-          `);
+        onArrive(ctx) {
+          log(name, "onArrive", ctx);
         },
-
+        onMeet(ctx) {
+          log(name, "onMeet", ctx);
+        },
         onExit(ctx) {
-          log(`
-            <span class="route">${name}</span> → onExit
-            <small>(to: ${ctx.to})</small>
-          `);
+          log(name, "onExit", ctx);
+        },
+        onReturn(ctx) {
+          log(name, "onReturn", ctx);
+        },
+        onComeback(ctx) {
+          log(name, "onComeback", ctx);
         }
       };
     }
+
+    // ==============================
+    // ROUTES
+    // ==============================
 
     history.router("/", createRoute("Home"));
     history.router("/about", createRoute("About"));

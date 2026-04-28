@@ -1,5 +1,5 @@
 // ==============================
-// History++ Core (Path Layer Ready)
+// History++ Core (Full Lifecycle)
 // ==============================
 
 (function () {
@@ -17,8 +17,6 @@
 
   /**
    * Configure router behavior.
-   * - base: base path prefix (e.g. "/examples/app")
-   * - mode: "history" (default) or "hash"
    */
   History.prototype.config = function (options = {}) {
     CONFIG.base = options.base || "";
@@ -29,31 +27,15 @@
   // PATH MANAGER
   // ==============================
 
-  /**
-   * Ensure path consistency.
-   * - Always starts with "/"
-   * - Removes accidental "#" prefix
-   */
   function normalizePath(path) {
     if (!path) return "/";
 
-    if (path.startsWith("#")) {
-      path = path.slice(1);
-    }
-
-    if (!path.startsWith("/")) {
-      path = "/" + path;
-    }
+    if (path.startsWith("#")) path = path.slice(1);
+    if (!path.startsWith("/")) path = "/" + path;
 
     return path;
   }
 
-  /**
-   * Remove base prefix before route matching.
-   * Example:
-   *   base = "/examples/app"
-   *   "/examples/app/about" -> "/about"
-   */
   function stripBase(path) {
     if (CONFIG.base && path.startsWith(CONFIG.base)) {
       const stripped = path.slice(CONFIG.base.length);
@@ -62,18 +44,12 @@
     return path;
   }
 
-  /**
-   * Add base prefix when building URLs.
-   */
   function addBase(path) {
     if (!CONFIG.base) return path;
     if (path.startsWith(CONFIG.base)) return path;
     return CONFIG.base + path;
   }
 
-  /**
-   * Parse query string into object.
-   */
   function parseQuery(search = "") {
     const query = {};
     const params = new URLSearchParams(search);
@@ -85,9 +61,6 @@
     return query;
   }
 
-  /**
-   * Build final URL based on mode and base.
-   */
   function buildURL(path) {
     path = normalizePath(path);
 
@@ -98,9 +71,6 @@
     return addBase(path);
   }
 
-  /**
-   * Read current path from browser depending on mode.
-   */
   function getCurrentPath() {
     if (CONFIG.mode === "hash") {
       const hash = location.hash.replace(/^#/, "");
@@ -114,22 +84,14 @@
   // ROUTE MATCHER
   // ==============================
 
-  /**
-   * Match route against registered routes.
-   * Supports:
-   * - exact match
-   * - dynamic params (/user/:id)
-   */
   function matchRoute(path) {
     path = normalizePath(path);
 
     for (const r of routes) {
-      // exact match
       if (r.path === path) {
         return { route: r, params: {} };
       }
 
-      // dynamic match
       if (r.path.includes(":")) {
         const keys = [];
 
@@ -160,13 +122,15 @@
   // ==============================
 
   /**
-   * Core navigation executor.
+   * Navigation lifecycle model:
    *
-   * Important design note:
-   * Browser "popstate" cannot be cancelled.
-   * Therefore, when canLeave() returns false on a "pop",
-   * we simulate cancellation by restoring the previous URL
-   * using replaceState (history mode) or hash overwrite (hash mode).
+   * PUSH / REPLACE:
+   *   current → onExit
+   *   next    → onArrive → onMeet
+   *
+   * POP:
+   *   current → onReturn → onExit
+   *   next    → onComeback → onMeet
    */
   function run(fullPath, type) {
     const [pathname, search = ""] = fullPath.split("?");
@@ -193,21 +157,13 @@
       const allowed = current.canLeave(ctx);
 
       if (!allowed) {
-        /**
-         * IMPORTANT:
-         * We cannot cancel popstate.
-         * Instead, we rollback the URL to the current route.
-         *
-         * This makes canLeave behave like a true navigation guard.
-         */
+        // rollback for pop navigation
         if (type === "pop" && current) {
           const rollbackURL = buildURL(current.path);
 
           if (CONFIG.mode === "hash") {
-            // restore hash without adding history entry
             location.replace("#" + current.path);
           } else {
-            // replace current history entry without growing stack
             history.replaceState(history.state, "", rollbackURL);
           }
         }
@@ -217,11 +173,18 @@
     }
 
     // ==============================
-    // EXIT HOOK
+    // EXIT PHASE (current route)
     // ==============================
 
-    if (current && current.onExit) {
-      current.onExit(ctx);
+    if (current) {
+      // Only triggered when leaving via pop (back/forward)
+      if (type === "pop" && current.onReturn) {
+        current.onReturn(ctx);
+      }
+
+      if (current.onExit) {
+        current.onExit(ctx);
+      }
     }
 
     if (!match) {
@@ -233,9 +196,22 @@
     current = next;
 
     // ==============================
-    // ENTER (onMeet)
+    // ENTER PHASE (next route)
     // ==============================
 
+    if (type === "pop") {
+      // Coming back via back/forward navigation
+      if (next.onComeback) {
+        next.onComeback(ctx);
+      }
+    } else {
+      // First arrival or navigation via push/replace
+      if (next.onArrive) {
+        next.onArrive(ctx);
+      }
+    }
+
+    // Always run onMeet
     if (next.onMeet) {
       next.onMeet(ctx);
     }
@@ -246,11 +222,7 @@
   // ==============================
 
   /**
-   * Register a route.
-   *
-   * Supports:
-   * - function shorthand → onMeet
-   * - object lifecycle definition
+   * Register a route with lifecycle hooks.
    */
   History.prototype.router = function (path, handler) {
     if (typeof handler === "function") {
@@ -259,8 +231,12 @@
 
     routes.push({
       path: normalizePath(path),
+
       onMeet: handler?.onMeet || (() => {}),
+      onArrive: handler?.onArrive || null,
       onExit: handler?.onExit || null,
+      onReturn: handler?.onReturn || null,
+      onComeback: handler?.onComeback || null,
       canLeave: handler?.canLeave || null
     });
 
@@ -268,12 +244,9 @@
   };
 
   // ==============================
-  // NAVIGATION METHODS
+  // NAVIGATION
   // ==============================
 
-  /**
-   * Push navigation (adds new history entry)
-   */
   History.prototype.navigatePush = function (path, state = {}) {
     const url = buildURL(path);
 
@@ -288,9 +261,6 @@
     run(url, "push");
   };
 
-  /**
-   * Replace navigation (does not add new entry)
-   */
   History.prototype.navigateReplace = function (path, state = {}) {
     const url = buildURL(path);
 
@@ -305,9 +275,6 @@
     run(url, "replace");
   };
 
-  /**
-   * Pop navigation (delegates to browser)
-   */
   History.prototype.navigatePop = function () {
     history.back();
   };
@@ -316,19 +283,12 @@
   // EVENTS
   // ==============================
 
-  /**
-   * popstate cannot be cancelled.
-   * Router must adapt after it happens.
-   */
   window.addEventListener("popstate", () => {
     if (CONFIG.mode === "history") {
       run(location.pathname + location.search, "pop");
     }
   });
 
-  /**
-   * Hash mode equivalent of popstate.
-   */
   window.addEventListener("hashchange", () => {
     if (CONFIG.mode === "hash") {
       run(getCurrentPath(), "pop");

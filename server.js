@@ -14,6 +14,9 @@ const mimeTypes = {
   ".css": "text/css",
 };
 
+/**
+ * Serve static file
+ */
 function serveFile(res, filePath) {
   if (!existsSync(filePath)) {
     res.writeHead(404);
@@ -28,42 +31,74 @@ function serveFile(res, filePath) {
   createReadStream(filePath).pipe(res);
 }
 
+/**
+ * Find nearest index.html by walking up directories
+ */
+function findNearestIndex(baseDir, urlPath) {
+  let currentPath = join(baseDir, urlPath);
+
+  while (true) {
+    const indexPath = join(currentPath, "index.html");
+
+    if (existsSync(indexPath)) {
+      return indexPath;
+    }
+
+    const parent = dirname(currentPath);
+
+    // stop when reaching project root
+    if (parent === currentPath || parent === baseDir) {
+      break;
+    }
+
+    currentPath = parent;
+  }
+
+  return null;
+}
+
 createServer((req, res) => {
   let urlPath = req.url.split("?")[0];
 
   console.log("REQ:", urlPath);
 
-  // root → examples index
+  // =========================
+  // ROOT
+  // =========================
   if (urlPath === "/") {
     return serveFile(res, join(__dirname, "examples/index.html"));
   }
 
   const filePath = join(__dirname, urlPath);
 
-  // direct file
+  // =========================
+  // STATIC FILE
+  // =========================
   if (existsSync(filePath) && !statSync(filePath).isDirectory()) {
     return serveFile(res, filePath);
   }
 
-  // folder → index.html
+  // =========================
+  // DIRECTORY → index.html
+  // =========================
   if (existsSync(filePath) && statSync(filePath).isDirectory()) {
     return serveFile(res, join(filePath, "index.html"));
   }
 
   // =========================
-  // SPA fallback for examples
+  // SMART SPA FALLBACK
   // =========================
   if (urlPath.startsWith("/examples/")) {
-    const parts = urlPath.split("/");
-    const exampleBase = parts.slice(0, 3).join("/"); 
-    // /examples/01-basic-routing
+    const found = findNearestIndex(__dirname, urlPath);
 
-    return serveFile(
-      res,
-      join(__dirname, exampleBase, "index.html")
-    );
+    if (found) {
+      return serveFile(res, found);
+    }
   }
 
+  // =========================
+  // NOT FOUND
+  // =========================
   res.writeHead(404);
   res.end("Not found");
 

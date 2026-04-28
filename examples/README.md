@@ -1,10 +1,10 @@
 # Examples
 
-This folder contains runnable demos for `History++`, each focused on a small navigation scenario so the router behavior is easier to inspect.
+This folder contains runnable demos for `History++`. Each example isolates one navigation scenario so the router behavior is easier to inspect, especially around route matching and lifecycle flow.
 
 ## Run the examples
 
-Start the local static server from the project root:
+Start the local server from the project root:
 
 ```bash
 node server.js
@@ -16,27 +16,60 @@ Then open:
 http://localhost:5173/examples/
 ```
 
-If the HTML files are opened directly with `file://`, demos that rely on history mode will not behave correctly.
+If you open the files directly with `file://`, demos that use `history` mode will not resolve routes correctly.
 
-## Available demos
+## What these demos cover
 
 Implemented demos:
 
-* `01-basic-routing` - basic route registration, active route switching, and push navigation
-* `02-dynamic-params` - dynamic segments such as `/article/:id`
-* `03-lifecycle-visualizer` - visualizes route lifecycle transitions
-* `07-bottom-sheet` - bottom-sheet style navigation driven by routes
+* `01-basic-routing` - the smallest setup for route registration, link interception, and initial URL sync
+* `02-dynamic-params` - dynamic route matching with params such as `/user/:id`
+* `03-lifecycle-visualizer` - full lifecycle visualization for `onArrive`, `onMeet`, `onReturn`, `onExit`, and `onComeback`
+* `07-bottom-sheet` - route-driven UI state for a bottom-sheet interaction
 
 Scaffolded folders:
 
-* `04-guards-blocking` - planned for navigation guard and blocking behavior
-* `05-hash-vs-history` - planned for comparing router modes
+* `04-guards-blocking` - planned for route guards and blocked navigation
+* `05-hash-vs-history` - planned for comparing navigation modes
 * `06-modal-route` - planned for modal route patterns
-* `08-multi-step-flow` - planned for multi-step flow navigation
+* `08-multi-step-flow` - planned for step-based flows
 * `09-middleware` - planned for middleware orchestration
+
+## Common pattern used in the demos
+
+Most demos follow the same setup:
+
+```js
+history.config({
+  base: "/examples/example-name",
+  mode: "history"
+});
+
+history.router("/", {
+  onMeet() {}
+});
+
+history.navigateReplace(location.pathname + location.search);
+```
+
+Why this matters:
+
+* `base` lets each demo run from its own subdirectory
+* `history` mode keeps the examples aligned with the main project behavior
+* `navigateReplace(location.pathname + location.search)` performs the initial sync from the current browser URL into the router
+
+## Lifecycle demo note
+
+`03-lifecycle-visualizer` is the best reference when you want to understand the current lifecycle model.
+
+It shows:
+
+* `push` and `replace` entering a route through `onArrive -> onMeet`
+* `pop` leaving the current route through `onReturn -> onExit`
+* `pop` re-activating the target route through `onComeback -> onMeet`
 
 ## Notes
 
-Each demo may configure a base path such as `/examples/01-basic-routing` so it can run from its own subdirectory without changing route definitions.
+The examples are intentionally framework-agnostic. They use plain HTML and direct DOM updates so the router behavior stays easy to observe.
 
 For the full API and design overview, see the root [README](../README.md).
