@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lifecycle Visualizer</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    nav a {
+      margin-right: 10px;
+      color: blue;
+      cursor: pointer;
+    }
+
+    #log {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      height: 200px;
+      overflow-y: auto;
+      background: #fafafa;
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    .item {
+      margin-bottom: 4px;
+    }
+
+    .route {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Lifecycle Visualizer</h1>
+
+  <nav>
+    <a href="/" data-link>Home</a>
+    <a href="/about" data-link>About</a>
+    <a href="/contact" data-link>Contact</a>
+  </nav>
+
+  <div id="log"></div>
+
+  <script src="../../src/index.js"></script>
+  <script>
+    const logEl = document.getElementById("log");
+
+    // ==============================
+    // CONFIG
+    // ==============================
+
+    history.config({
+      base: "/examples/03-lifecycle-visualizer",
+      mode: "history"
+    });
+
+    // ==============================
+    // LOGGER
+    // ==============================
+
+    function log(message) {
+      const el = document.createElement("div");
+      el.className = "item";
+      el.innerHTML = message;
+
+      logEl.appendChild(el);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function clearLog() {
+      logEl.innerHTML = "";
+    }
+
+    // ==============================
+    // LINK INTERCEPTION
+    // ==============================
+
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest("[data-link]");
+      if (!a) return;
+
+      const url = new URL(a.href);
+      if (url.origin !== location.origin) return;
+
+      e.preventDefault();
+      history.navigatePush(url.pathname + url.search);
+    });
+
+    // ==============================
+    // ROUTES
+    // ==============================
+
+    function createRoute(name) {
+      return {
+        onMeet(ctx) {
+          log(`
+            <span class="route">${name}</span> → onMeet
+            <small>(type: ${ctx.type})</small>
+          `);
+        },
+
+        onExit(ctx) {
+          log(`
+            <span class="route">${name}</span> → onExit
+            <small>(to: ${ctx.to})</small>
+          `);
+        }
+      };
+    }
+
+    history.router("/", createRoute("Home"));
+    history.router("/about", createRoute("About"));
+    history.router("/contact", createRoute("Contact"));
+
+    // ==============================
+    // INITIAL SYNC
+    // ==============================
+
+    clearLog();
+    history.navigateReplace(location.pathname + location.search);
+  </script>
+</body>
+</html>

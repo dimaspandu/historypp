@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bottom Sheet (State Driven)</title>
+  <title>Bottom Sheet (State-driven)</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
 
@@ -12,7 +12,7 @@
       cursor: pointer;
     }
 
-    /* overlay */
+    /* Overlay */
     #overlay {
       position: fixed;
       inset: 0;
@@ -27,7 +27,7 @@
       pointer-events: auto;
     }
 
-    /* bottom sheet */
+    /* Bottom sheet */
     #sheet {
       position: fixed;
       left: 0;
@@ -68,14 +68,17 @@
     const openBtn = document.getElementById("open");
     const closeBtn = document.getElementById("close");
 
-    // Configure router
+    // ==============================
+    // CONFIG
+    // ==============================
+
     history.config({
       base: "/examples/07-bottom-sheet",
       mode: "history"
     });
 
     // ==============================
-    // UI Helpers
+    // UI HELPERS
     // ==============================
 
     function openSheet() {
@@ -89,17 +92,15 @@
     }
 
     // ==============================
-    // ROUTES (STATE-DRIVEN)
+    // ROUTES (STATE = UI)
     // ==============================
 
-    // Root route represents "no sheet"
     history.router("/", {
       onMeet() {
         closeSheet();
       }
     });
 
-    // Details route represents "sheet open"
     history.router("/details", {
       onMeet() {
         openSheet();
@@ -126,8 +127,6 @@
     // INITIAL SYNC
     // ==============================
 
-    // Important:
-    // Normalize current URL into router system
     history.navigateReplace(location.pathname + location.search);
   </script>
 </body>

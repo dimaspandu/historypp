@@ -2,20 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Basic Routing</title>
+  <title>Dynamic Params</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
-    nav a { margin-right: 10px; cursor: pointer; color: blue; }
+    a { display: inline-block; margin-right: 10px; color: blue; cursor: pointer; }
     #view { margin-top: 20px; }
   </style>
 </head>
 <body>
 
-  <h1>Basic Routing</h1>
+  <h1>Dynamic Params</h1>
 
   <nav>
-    <a href="/" data-link>Home</a>
-    <a href="/about" data-link>About</a>
+    <a href="/user/1" data-link>User 1</a>
+    <a href="/user/2" data-link>User 2</a>
+    <a href="/user/42" data-link>User 42</a>
   </nav>
 
   <div id="view"></div>
@@ -29,7 +30,7 @@
     // ==============================
 
     history.config({
-      base: "/examples/01-basic-routing",
+      base: "/examples/02-dynamic-params",
       mode: "history"
     });
 
@@ -43,7 +44,6 @@
 
       const url = new URL(a.href);
 
-      // Only intercept same-origin navigation
       if (url.origin !== location.origin) return;
 
       e.preventDefault();
@@ -54,20 +54,40 @@
     // ROUTES
     // ==============================
 
-    history.router("/", {
-      onMeet() {
+    /**
+     * Dynamic route
+     *
+     * Example:
+     *   /user/1 → ctx.params.id = "1"
+     */
+    history.router("/user/:id", {
+      onMeet(ctx) {
+        const { id } = ctx.params;
+
         view.innerHTML = `
-          <h2>Home</h2>
-          <p>Welcome home</p>
+          <h2>User ${id}</h2>
+          <p>This page is rendered using a dynamic route.</p>
+
+          <button id="next">Go to next user</button>
         `;
+
+        // Example: programmatic navigation using params
+        document.getElementById("next").onclick = () => {
+          const nextId = Number(id) + 1;
+          history.navigatePush(`/user/${nextId}`);
+        };
       }
     });
 
-    history.router("/about", {
+    /**
+     * Optional root route
+     * (helps when landing on base path)
+     */
+    history.router("/", {
       onMeet() {
         view.innerHTML = `
-          <h2>About</h2>
-          <p>About page</p>
+          <h2>Welcome</h2>
+          <p>Select a user to begin.</p>
         `;
       }
     });

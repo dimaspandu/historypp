@@ -1,159 +1,42 @@
-# History++ (History Router)
+# Examples
 
-A lightweight, UI-agnostic navigation engine built on top of the native History API.
+This folder contains runnable demos for `History++`, each focused on a small navigation scenario so the router behavior is easier to inspect.
 
-It extends `window.history` with structured routing, lifecycle control, and navigation orchestration — without external dependencies.
+## Run the examples
 
----
-
-## Overview
-
-This system enhances the native browser navigation model while preserving its behavior:
-
-* No page reloads
-* Native back/forward support
-* URL-driven state
-* History stack integrity
-
-The router acts purely as an orchestration layer and does not handle rendering.
-
----
-
-## Getting Started
-
-### Run Local Server
-
-This project includes a simple Node.js static server for running examples.
+Start the local static server from the project root:
 
 ```bash
 node server.js
 ```
 
-Then open in your browser:
+Then open:
 
 ```text
-http://localhost:5173
+http://localhost:5173/examples/
 ```
 
----
+If the HTML files are opened directly with `file://`, demos that rely on history mode will not behave correctly.
 
-### Why a Server is Required
+## Available demos
 
-When using **history mode**, the browser relies on the History API (`pushState`, `replaceState`).
+Implemented demos:
 
-Opening files directly using:
+* `01-basic-routing` - basic route registration, active route switching, and push navigation
+* `02-dynamic-params` - dynamic segments such as `/article/:id`
+* `03-lifecycle-visualizer` - visualizes route lifecycle transitions
+* `07-bottom-sheet` - bottom-sheet style navigation driven by routes
 
-```text
-file://...
-```
+Scaffolded folders:
 
-will break routing behavior.
+* `04-guards-blocking` - planned for navigation guard and blocking behavior
+* `05-hash-vs-history` - planned for comparing router modes
+* `06-modal-route` - planned for modal route patterns
+* `08-multi-step-flow` - planned for multi-step flow navigation
+* `09-middleware` - planned for middleware orchestration
 
----
+## Notes
 
-### Alternative (No Server)
+Each demo may configure a base path such as `/examples/01-basic-routing` so it can run from its own subdirectory without changing route definitions.
 
-If you cannot run a server, switch to hash mode:
-
-```js
-history.config({
-  mode: "hash"
-});
-```
-
----
-
-## Examples
-
-Available examples:
-
-* `/examples/01-basic-routing`
-* `/examples/07-bottom-sheet`
-
-More examples are included as scaffolding and will be expanded.
-
----
-
-## Routing Modes
-
-### History Mode (default)
-
-```text
-/about
-```
-
-Uses the native History API.
-
----
-
-### Hash Mode
-
-```text
-/#/about
-```
-
-Uses `location.hash` and works without server configuration.
-
----
-
-## Base Path
-
-For apps running in subdirectories:
-
-```js
-history.config({
-  base: "/examples/01-basic-routing"
-});
-```
-
----
-
-## Core API
-
-```js
-history.router(path, handler?)
-history.navigatePush(path, state?)
-history.navigateReplace(path, state?)
-history.navigatePop()
-```
-
----
-
-## Basic Usage
-
-```js
-history.router("/", () => {
-  console.log("Home");
-});
-
-history.router("/about", () => {
-  console.log("About");
-});
-
-history.navigatePush("/about");
-```
-
----
-
-## Lifecycle
-
-| Hook   | Description                    |
-| ------ | ------------------------------ |
-| onMeet | Runs when route becomes active |
-| onExit | Runs before leaving the route  |
-
----
-
-## Design Principles
-
-1. Router is an orchestration layer
-2. No dependency on UI frameworks
-3. URL is the source of truth
-4. Routes describe UI state, not transitions
-5. Native browser behavior is preserved
-
----
-
-## License
-
-MIT
+For the full API and design overview, see the root [README](../README.md).

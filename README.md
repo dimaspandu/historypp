@@ -1,6 +1,6 @@
-# History Router (SPA Navigation Engine)
+# History++ (SPA Navigation Engine)
 
-A lightweight, UI-agnostic navigation engine built on top of the native History API. This design extends the `window.history` object to provide structured routing, lifecycle control, and navigation orchestration without introducing external dependencies.
+A lightweight, UI-agnostic navigation engine built on top of the native History API. This project extends `window.history` with structured routing, lifecycle control, and navigation orchestration without introducing external dependencies.
 
 ---
 
@@ -63,12 +63,20 @@ history.config({
 
 ## Examples
 
-Available examples:
+Open the example index after starting the local server:
 
-* `/examples/01-basic-routing`
-* `/examples/07-bottom-sheet`
+```text
+http://localhost:5173/examples/
+```
 
-More examples are included as scaffolding and will be expanded.
+Currently available interactive examples:
+
+* `/examples/01-basic-routing` - route registration and programmatic navigation
+* `/examples/02-dynamic-params` - dynamic path segments such as `/article/:id`
+* `/examples/03-lifecycle-visualizer` - route lifecycle transitions and state changes
+* `/examples/07-bottom-sheet` - bottom-sheet style navigation flow
+
+Additional example directories already exist as scaffolding for future scenarios.
 
 ---
 
@@ -78,7 +86,7 @@ This system supports two routing modes:
 
 ### History Mode (default)
 
-```
+```text
 /about
 ```
 
@@ -97,7 +105,7 @@ Direct access or reload on nested routes must be handled accordingly by the serv
 
 ### Hash Mode
 
-```
+```text
 /#/about
 ```
 
@@ -133,8 +141,8 @@ Navigation paths are normalized and resolved through the internal path layer.
 
 Example (with base = "/app"):
 
-```
-navigatePush("/about") → /app/about
+```text
+navigatePush("/about") -> /app/about
 ```
 
 Notes:
@@ -158,12 +166,12 @@ Internally, the following steps are applied:
 
 Mode-specific behavior:
 
-* History mode → uses `location.pathname + location.search`
-* Hash mode → uses `location.hash` (without `#`)
+* History mode -> uses `location.pathname + location.search`
+* Hash mode -> uses `location.hash` (without `#`)
 
 Example:
 
-```
+```text
 URL: /examples/01-basic-routing/about?tab=1
 
 Resolved:
@@ -201,7 +209,7 @@ The base path is:
 
 Example:
 
-```
+```text
 URL:        /examples/01-basic-routing/about
 Base:       /examples/01-basic-routing
 Route path: /about
@@ -421,7 +429,7 @@ Execution order:
 
 It answers the question:
 
-```
+```text
 Is the current route allowed to be exited?
 ```
 
@@ -433,7 +441,7 @@ This check is performed for every navigation attempt:
 
 Flow perspective:
 
-```
+```text
 [current route] --(canLeave?)--> [next route]
 ```
 
@@ -441,8 +449,8 @@ If `canLeave` returns `false`, navigation is cancelled before any lifecycle of t
 
 Relation to lifecycle:
 
-* `canLeave` → decision (guard)
-* `onExit` → side effect (executed after allowed)
+* `canLeave` -> decision (guard)
+* `onExit` -> side effect (executed after allowed)
 
 ---
 
@@ -531,8 +539,8 @@ Server behavior depends on the application architecture:
 
 All routes should resolve to a single HTML entry file:
 
-```
-/about → index.html
+```text
+/about -> index.html
 ```
 
 Requires server-side fallback configuration.
@@ -543,9 +551,9 @@ Requires server-side fallback configuration.
 
 Each route may return its own HTML document:
 
-```
-/       → index.html
-/about  → about.html
+```text
+/       -> index.html
+/about  -> about.html
 ```
 
 The router acts as a client-side orchestration layer on top of server-rendered content.
