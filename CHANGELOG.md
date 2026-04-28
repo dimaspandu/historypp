@@ -4,6 +4,39 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.1.0] - 2026-04-28
+
+### Added
+- Implemented full direction-aware lifecycle hooks:
+  - `onArrive`
+  - `onMeet`
+  - `onReturn`
+  - `onExit`
+  - `onComeback`
+- Added smart example server fallback that resolves the nearest `index.html` for nested example routes
+- Added dynamic params example:
+  - `examples/02-dynamic-params`
+- Added lifecycle visualizer example:
+  - `examples/03-lifecycle-visualizer`
+- Added guards and blocking example:
+  - `examples/04-guards-blocking`
+
+### Changed
+- Refined router execution flow to distinguish `push`/`replace` from `pop` navigation
+- Expanded route registration to support the full lifecycle model in the core router
+- Updated example index to expose the new demos
+- Refreshed the root and examples README files to match the current implementation and lifecycle behavior
+
+### Fixed
+- Improved deep-link handling for history-mode examples served from nested paths
+- Cleaned up routing documentation so API behavior matches the current codebase
+
+### Notes
+- This release shifts the project from basic route orchestration toward a more complete lifecycle-driven navigation model
+- Guard behavior is now demonstrated with a dedicated example for unsaved-form navigation blocking
+
+---
+
 ## [1.0.2] - 2026-04-22
 
 ### Added

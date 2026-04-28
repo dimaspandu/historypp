@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Guards & Blocking</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    nav a {
+      margin-right: 10px;
+      color: blue;
+      cursor: pointer;
+    }
+
+    #view {
+      margin-top: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 10px;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Guards & Blocking</h1>
+
+  <nav>
+    <a href="/" data-link>Home</a>
+    <a href="/form" data-link>Form</a>
+    <a href="/about" data-link>About</a>
+  </nav>
+
+  <div id="view"></div>
+
+  <script src="../../src/index.js"></script>
+  <script>
+    const view = document.getElementById("view");
+
+    // ==============================
+    // CONFIG
+    // ==============================
+
+    history.config({
+      base: "/examples/04-guards-blocking",
+      mode: "history"
+    });
+
+    // ==============================
+    // LINK INTERCEPTION
+    // ==============================
+
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest("[data-link]");
+      if (!a) return;
+
+      const url = new URL(a.href);
+      if (url.origin !== location.origin) return;
+
+      e.preventDefault();
+      history.navigatePush(url.pathname + url.search);
+    });
+
+    // ==============================
+    // STATE
+    // ==============================
+
+    let isDirty = false;
+
+    // ==============================
+    // ROUTES
+    // ==============================
+
+    history.router("/", {
+      onMeet() {
+        view.innerHTML = `
+          <h2>Home</h2>
+          <p>This is a normal page.</p>
+        `;
+      }
+    });
+
+    history.router("/about", {
+      onMeet() {
+        view.innerHTML = `
+          <h2>About</h2>
+          <p>Another safe page.</p>
+        `;
+      }
+    });
+
+    history.router("/form", {
+      onMeet() {
+        view.innerHTML = `
+          <h2>Form Page</h2>
+          <p>Try typing something and navigate away.</p>
+
+          <textarea id="input" placeholder="Type something..."></textarea>
+
+          <div class="status">
+            Status: <span id="status">clean</span>
+          </div>
+        `;
+
+        const input = document.getElementById("input");
+        const status = document.getElementById("status");
+
+        input.oninput = () => {
+          isDirty = true;
+          status.textContent = "dirty (unsaved)";
+        };
+      },
+
+      /**
+       * Guard logic
+       *
+       * This runs BEFORE leaving the route.
+       */
+      canLeave(ctx) {
+        if (!isDirty) return true;
+
+        const confirmLeave = confirm(
+          "You have unsaved changes. Leave anyway?"
+        );
+
+        if (confirmLeave) {
+          isDirty = false;
+          return true;
+        }
+
+        return false;
+      },
+
+      onExit() {
+        // reset state when leaving
+        isDirty = false;
+      }
+    });
+
+    // ==============================
+    // INITIAL SYNC
+    // ==============================
+
+    history.navigateReplace(location.pathname + location.search);
+  </script>
+</body>
+</html>
