@@ -26,12 +26,13 @@ Implemented demos:
 * `02-dynamic-params` - dynamic route matching with params such as `/user/:id`
 * `03-lifecycle-visualizer` - full lifecycle visualization for `onArrive`, `onMeet`, `onReturn`, `onExit`, and `onComeback`
 * `04-guards-blocking` - route guard behavior for unsaved changes and blocked navigation
+* `06-end-route` - terminal route behavior for mobile-like push navigation and browser back handling
 * `07-bottom-sheet` - route-driven UI state for a bottom-sheet interaction
 
 Scaffolded folders:
 
 * `05-hash-vs-history` - planned for comparing navigation modes
-* `06-modal-route` - planned for modal route patterns
+* `06-modal-route` - still available as a separate scaffold for modal route patterns
 * `08-multi-step-flow` - planned for step-based flows
 * `09-middleware` - planned for middleware orchestration
 
@@ -57,6 +58,16 @@ Why this matters:
 * `base` lets each demo run from its own subdirectory
 * `history` mode keeps the examples aligned with the main project behavior
 * `navigateReplace(location.pathname + location.search)` performs the initial sync from the current browser URL into the router
+
+## End route demo note
+
+`06-end-route` demonstrates route definitions that use `end: true`.
+
+It shows:
+
+* push-based navigation between sibling screens
+* a terminal route acting as the root boundary of the demo flow
+* browser back behavior when the active route is marked as an end route
 
 ## Lifecycle demo note
 

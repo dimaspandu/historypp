@@ -93,6 +93,8 @@ Available demos:
 * `/examples/01-basic-routing` - basic route registration and route switching
 * `/examples/02-dynamic-params` - dynamic path segments such as `/user/:id`
 * `/examples/03-lifecycle-visualizer` - visualizes the full lifecycle flow for push, replace, and pop
+* `/examples/04-guards-blocking` - demonstrates `canLeave` and blocked navigation flows
+* `/examples/06-end-route` - demonstrates terminal routes in mobile-like push navigation
 * `/examples/07-bottom-sheet` - route-driven bottom-sheet interaction
 
 More scenario folders already exist under `examples/` as scaffolding.
@@ -267,6 +269,29 @@ history.navigatePush("/user/42");
 ```
 
 Static routes are matched before dynamic ones with the same shape.
+
+---
+
+## End Route
+
+Routes can be marked as terminal by setting `end: true`.
+
+```js
+history.router("/", {
+  end: true,
+  onMeet() {
+    console.log("Home");
+  }
+});
+```
+
+Behavior:
+
+* Intended for flows where a route should behave like the root boundary of the current app state
+* In `history` mode, if the active route is marked as `end` and the user navigates back, the router lets the browser continue going further back in history
+* Useful for mobile-like tab navigation or embedded flows where the root screen should act as the exit point
+
+See `/examples/06-end-route` for the current behavior in practice.
 
 ---
 

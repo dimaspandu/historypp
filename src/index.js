@@ -237,7 +237,8 @@
       onExit: handler?.onExit || null,
       onReturn: handler?.onReturn || null,
       onComeback: handler?.onComeback || null,
-      canLeave: handler?.canLeave || null
+      canLeave: handler?.canLeave || null,
+      end: handler?.end || false
     });
 
     return this;
@@ -284,9 +285,18 @@
   // ==============================
 
   window.addEventListener("popstate", () => {
-    if (CONFIG.mode === "history") {
-      run(location.pathname + location.search, "pop");
+    if (CONFIG.mode !== "history") return;
+
+    const nextPath = normalizePath(location.pathname + location.search);
+
+    // If current route is marked as end,
+    // and user tries to go back → exit app (go further back)
+    if (current && current.end) {
+      history.go(-1);
+      return;
     }
+
+    run(nextPath, "pop");
   });
 
   window.addEventListener("hashchange", () => {

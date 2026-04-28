@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.2.0] - 2026-04-28
+
+### Added
+- Added `end` route support in the core router for terminal-route navigation behavior
+- Added end-route example:
+  - `examples/06-end-route`
+
+### Changed
+- Updated example index to include the end-route demo
+- Updated root and examples README files to document terminal-route behavior and the new example
+
+### Notes
+- This release expands support for mobile-like navigation flows where a route can act as the exit boundary of the current history-driven experience
+
+---
+
 ## [1.1.0] - 2026-04-28
 
 ### Added
