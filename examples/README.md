@@ -25,11 +25,11 @@ Implemented demos:
 * `01-basic-routing` - the smallest setup for route registration, link interception, and initial URL sync
 * `02-dynamic-params` - dynamic route matching with params such as `/user/:id`
 * `03-lifecycle-visualizer` - full lifecycle visualization for `onArrive`, `onMeet`, `onReturn`, `onExit`, and `onComeback`
+* `04-guards-blocking` - route guard behavior for unsaved changes and blocked navigation
 * `07-bottom-sheet` - route-driven UI state for a bottom-sheet interaction
 
 Scaffolded folders:
 
-* `04-guards-blocking` - planned for route guards and blocked navigation
 * `05-hash-vs-history` - planned for comparing navigation modes
 * `06-modal-route` - planned for modal route patterns
 * `08-multi-step-flow` - planned for step-based flows
