@@ -15,9 +15,6 @@
     mode: "history" // "history" | "hash"
   };
 
-  /**
-   * Configure router behavior.
-   */
   History.prototype.config = function (options = {}) {
     CONFIG.base = options.base || "";
     CONFIG.mode = options.mode || "history";
@@ -118,20 +115,29 @@
   }
 
   // ==============================
-  // CORE RUNNER
+  // END RESOLVER (NEW)
   // ==============================
 
   /**
-   * Navigation lifecycle model:
-   *
-   * PUSH / REPLACE:
-   *   current → onExit
-   *   next    → onArrive → onMeet
-   *
-   * POP:
-   *   current → onReturn → onExit
-   *   next    → onComeback → onMeet
+   * Resolve whether a route is an end route.
+   * Supports:
+   * - boolean
+   * - function(ctx)
    */
+  function isEndRoute(route, ctx) {
+    if (!route) return false;
+
+    if (typeof route.end === "function") {
+      return !!route.end(ctx);
+    }
+
+    return !!route.end;
+  }
+
+  // ==============================
+  // CORE RUNNER
+  // ==============================
+
   function run(fullPath, type) {
     const [pathname, search = ""] = fullPath.split("?");
 
@@ -157,7 +163,6 @@
       const allowed = current.canLeave(ctx);
 
       if (!allowed) {
-        // rollback for pop navigation
         if (type === "pop" && current) {
           const rollbackURL = buildURL(current.path);
 
@@ -173,11 +178,10 @@
     }
 
     // ==============================
-    // EXIT PHASE (current route)
+    // EXIT PHASE
     // ==============================
 
     if (current) {
-      // Only triggered when leaving via pop (back/forward)
       if (type === "pop" && current.onReturn) {
         current.onReturn(ctx);
       }
@@ -196,22 +200,19 @@
     current = next;
 
     // ==============================
-    // ENTER PHASE (next route)
+    // ENTER PHASE
     // ==============================
 
     if (type === "pop") {
-      // Coming back via back/forward navigation
       if (next.onComeback) {
         next.onComeback(ctx);
       }
     } else {
-      // First arrival or navigation via push/replace
       if (next.onArrive) {
         next.onArrive(ctx);
       }
     }
 
-    // Always run onMeet
     if (next.onMeet) {
       next.onMeet(ctx);
     }
@@ -221,9 +222,6 @@
   // ROUTER API
   // ==============================
 
-  /**
-   * Register a route with lifecycle hooks.
-   */
   History.prototype.router = function (path, handler) {
     if (typeof handler === "function") {
       handler = { onMeet: handler };
@@ -238,7 +236,7 @@
       onReturn: handler?.onReturn || null,
       onComeback: handler?.onComeback || null,
       canLeave: handler?.canLeave || null,
-      end: handler?.end || false
+      end: handler?.end ?? false
     });
 
     return this;
@@ -287,16 +285,22 @@
   window.addEventListener("popstate", () => {
     if (CONFIG.mode !== "history") return;
 
-    const nextPath = normalizePath(location.pathname + location.search);
+    // minimal ctx for end evaluation
+    const ctx = {
+      path: current?.path,
+      from: current?.path,
+      to: null,
+      type: "pop",
+      query: {}
+    };
 
-    // If current route is marked as end,
-    // and user tries to go back → exit app (go further back)
-    if (current && current.end) {
+    // dynamic end support
+    if (current && isEndRoute(current, ctx)) {
       history.go(-1);
       return;
     }
 
-    run(nextPath, "pop");
+    run(location.pathname + location.search, "pop");
   });
 
   window.addEventListener("hashchange", () => {

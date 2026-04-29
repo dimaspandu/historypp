@@ -6,9 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -16,33 +14,21 @@
       font-family: sans-serif;
     }
 
-    /* ==============================
-       APP CONTAINER
-    ============================== */
-
     .app {
       display: flex;
       flex-direction: column;
       height: 100vh;
-
       width: 100%;
       max-width: 480px;
       margin: 0 auto;
-
       background: white;
       border-left: 1px solid #ddd;
       border-right: 1px solid #ddd;
     }
 
     @media (max-width: 480px) {
-      .app {
-        border: none;
-      }
+      .app { border: none; }
     }
-
-    /* ==============================
-       CONTENT
-    ============================== */
 
     #view {
       flex: 1;
@@ -50,18 +36,19 @@
       overflow-y: auto;
     }
 
-    h2 {
-      margin-top: 0;
-    }
+    h2 { margin-top: 0; }
 
     .desc {
       color: #666;
       font-size: 14px;
     }
 
-    /* ==============================
-       BOTTOM NAV
-    ============================== */
+    .box {
+      margin-top: 15px;
+      padding: 10px;
+      background: #fafafa;
+      border: 1px solid #eee;
+    }
 
     nav {
       display: flex;
@@ -113,7 +100,6 @@
       btn.onclick = () => {
         const target = btn.dataset.link;
 
-        // Prevent duplicate push (important for clean demo)
         if (location.pathname.endsWith(target)) return;
 
         history.navigatePush(target);
@@ -126,35 +112,77 @@
       });
     }
 
-    function render(title, content) {
+    function render(title, content, extra = "") {
       view.innerHTML = `
         <h2>${title}</h2>
         <p>${content}</p>
 
         <p class="desc">
-          Try navigating between tabs using PUSH.<br/>
-          Then press browser back.
+          Using PUSH navigation.<br/>
+          Press browser back to observe behavior.
         </p>
+
+        ${extra}
       `;
     }
+
+    // ==============================
+    // STATE (for dynamic end)
+    // ==============================
+
+    let allowExit = false;
 
     // ==============================
     // ROUTES
     // ==============================
 
-    // HOME = END ROUTE
+    /**
+     * HOME → boolean end
+     * Always terminal route
+     */
     history.router("/", {
       end: true,
       onMeet() {
         setActive("/");
-        render("Home (End Route)", "This is the root screen.");
+        render(
+          "Home (end: true)",
+          "This route always exits when pressing back."
+        );
       }
     });
 
+    /**
+     * ABOUT → dynamic end (function)
+     */
     history.router("/about", {
+      end(ctx) {
+        // Only allow exit if toggle is enabled
+        return allowExit;
+      },
+
       onMeet() {
         setActive("/about");
-        render("About", "Information page.");
+
+        render(
+          "About (end: function)",
+          "Back will exit ONLY if toggle is enabled.",
+          `
+          <div class="box">
+            <label>
+              <input type="checkbox" id="toggle" />
+              Allow exit on back
+            </label>
+          </div>
+          `
+        );
+
+        const toggle = document.getElementById("toggle");
+
+        toggle.checked = allowExit;
+
+        toggle.onchange = () => {
+          allowExit = toggle.checked;
+        };
       }
     });
 
