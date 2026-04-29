@@ -1,11 +1,10 @@
 // ==============================
-// History++ Core v1.0.1
-// Full Lifecycle + Middleware
+// History++ Core v1.0.0
+// Full Lifecycle
 // ==============================
 
 (function () {
   const routes = [];
-  const middlewares = [];
   let current = null;
 
   // ==============================
@@ -14,47 +13,13 @@
 
   let CONFIG = {
     base: "",
-    mode: "history"
+    mode: "history" // "history" | "hash"
   };
 
   History.prototype.config = function (options = {}) {
     CONFIG.base = options.base || "";
     CONFIG.mode = options.mode || "history";
   };
-
-  // ==============================
-  // MIDDLEWARE API (NEW)
-  // ==============================
-
-  /**
-   * Register middleware
-   * @param {(ctx, next) => void} fn
-   */
-  History.prototype.use = function (fn) {
-    middlewares.push(fn);
-  };
-
-  /**
-   * Execute middleware chain
-   */
-  function runMiddlewares(ctx, finalHandler) {
-    let index = -1;
-
-    function dispatch(i) {
-      if (i <= index) return;
-      index = i;
-
-      const mw = middlewares[i];
-
-      if (!mw) {
-        return finalHandler();
-      }
-
-      return mw(ctx, () => dispatch(i + 1));
-    }
-
-    return dispatch(0);
-  }
 
   // ==============================
   // PATH MANAGER
@@ -151,9 +116,15 @@
   }
 
   // ==============================
-  // END RESOLVER
+  // END RESOLVER (NEW)
   // ==============================
 
+  /**
+   * Resolve whether a route is an end route.
+   * Supports:
+   * - boolean
+   * - function(ctx)
+   */
   function isEndRoute(route, ctx) {
     if (!route) return false;
 
@@ -186,73 +157,66 @@
     };
 
     // ==============================
-    // MIDDLEWARE PIPELINE (NEW)
+    // GUARD (canLeave)
     // ==============================
 
-    runMiddlewares(ctx, () => {
+    if (current && current.canLeave) {
+      const allowed = current.canLeave(ctx);
 
-      // ==============================
-      // GUARD
-      // ==============================
+      if (!allowed) {
+        if (type === "pop" && current) {
+          const rollbackURL = buildURL(current.path);
 
-      if (current && current.canLeave) {
-        const allowed = current.canLeave(ctx);
-
-        if (!allowed) {
-          if (type === "pop" && current) {
-            const rollbackURL = buildURL(current.path);
-
-            if (CONFIG.mode === "hash") {
-              location.replace("#" + current.path);
-            } else {
-              history.replaceState(history.state, "", rollbackURL);
-            }
+          if (CONFIG.mode === "hash") {
+            location.replace("#" + current.path);
+          } else {
+            history.replaceState(history.state, "", rollbackURL);
           }
-
-          return;
-        }
-      }
-
-      // ==============================
-      // EXIT PHASE
-      // ==============================
-
-      if (current) {
-        if (type === "pop" && current.onReturn) {
-          current.onReturn(ctx);
         }
 
-        if (current.onExit) {
-          current.onExit(ctx);
-        }
-      }
-
-      if (!match) {
-        console.warn("Route not found:", cleanPath);
         return;
       }
+    }
 
-      const next = match.route;
-      current = next;
+    // ==============================
+    // EXIT PHASE
+    // ==============================
 
-      // ==============================
-      // ENTER PHASE
-      // ==============================
-
-      if (type === "pop") {
-        if (next.onComeback) {
-          next.onComeback(ctx);
-        }
-      } else {
-        if (next.onArrive) {
-          next.onArrive(ctx);
-        }
+    if (current) {
+      if (type === "pop" && current.onReturn) {
+        current.onReturn(ctx);
       }
 
-      if (next.onMeet) {
-        next.onMeet(ctx);
+      if (current.onExit) {
+        current.onExit(ctx);
       }
-    });
+    }
+
+    if (!match) {
+      console.warn("Route not found:", cleanPath);
+      return;
+    }
+
+    const next = match.route;
+    current = next;
+
+    // ==============================
+    // ENTER PHASE
+    // ==============================
+
+    if (type === "pop") {
+      if (next.onComeback) {
+        next.onComeback(ctx);
+      }
+    } else {
+      if (next.onArrive) {
+        next.onArrive(ctx);
+      }
+    }
+
+    if (next.onMeet) {
+      next.onMeet(ctx);
+    }
   }
 
   // ==============================
@@ -322,6 +286,7 @@
   window.addEventListener("popstate", () => {
     if (CONFIG.mode !== "history") return;
 
+    // minimal ctx for end evaluation
     const ctx = {
       path: current?.path,
       from: current?.path,
@@ -330,6 +295,7 @@
       query: {}
     };
 
+    // dynamic end support
     if (current && isEndRoute(current, ctx)) {
       history.go(-1);
       return;

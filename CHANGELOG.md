@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.4.0] - 2026-04-29
+
+### Added
+- Added middleware support to the core router:
+  - `history.use()` for registering middleware functions
+  - Middleware pipeline executed before route handling
+- Added multi-step flow example:
+  - `examples/09-multi-step-flow`
+- Added middleware example:
+  - `examples/10-middleware`
+
+### Changed
+- Updated all example UIs to mobile-friendly design with consistent app containers, headers, and navigation
+- Updated example index to include the new demos
+- Updated README to document middleware API and new examples
+
+### Notes
+- This release introduces middleware pipeline for request processing and significantly enhances example UIs for better demonstration and user experience
+
+---
+
 ## [1.3.0] - 2026-04-29
 
 ### Added

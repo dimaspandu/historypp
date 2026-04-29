@@ -98,6 +98,8 @@ Available demos:
 * `/examples/06-end-route` - demonstrates terminal routes in mobile-like push navigation
 * `/examples/07-modal-route` - demonstrates modal-based route navigation
 * `/examples/08-bottom-sheet` - route-driven bottom-sheet interaction
+* `/examples/09-multi-step-flow` - demonstrates multi-step navigation flows
+* `/examples/10-middleware` - shows how to use middleware in routing
 
 ---
 
@@ -135,6 +137,7 @@ history.config({
 ```js
 history.config(options)
 history.router(path, handler?)
+history.use(middlewareFn)
 history.navigatePush(path, state?)
 history.navigateReplace(path, state?)
 history.navigatePop()
@@ -313,6 +316,21 @@ Browser URL: /examples/02-dynamic-params/user/7?tab=info
 Matched path: /user/7
 ctx.query: { tab: "info" }
 ```
+
+---
+
+## Middleware
+
+Middleware allows you to run code before route handling, useful for logging, authentication, or modifying the context.
+
+```js
+history.use((ctx, next) => {
+  console.log("Middleware:", ctx.path);
+  next();
+});
+```
+
+Middleware functions receive the context object and a `next()` function. Call `next()` to continue to the next middleware or route handler. Middleware is executed in registration order before any route guards or lifecycle hooks.
 
 ---
 
