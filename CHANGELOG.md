@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.6.0] - 2026-04-29
+
+### Added
+- Added comprehensive unit tests for router core in `tests/` folder
+- Added modular ESM version of router core (`src/router-core.mjs`) for isolated testing
+- Implemented tests for route matching, path normalization, base path handling, middleware pipeline, and navigation logic
+
+### Changed
+- Refactored tests to use ESM imports and Node.js built-in assert
+- Updated test runner to support ESM modules
+
+### Notes
+- This release establishes testing infrastructure to ensure router core reliability without DOM dependencies
+
+---
+
 ## [1.5.0] - 2026-04-29
 
 ### Added

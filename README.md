@@ -404,6 +404,28 @@ Multi-entry or SSR:
 
 ---
 
+## Testing
+
+The project includes unit tests for the router core functionality, runnable in Node.js without DOM dependencies.
+
+Run all tests:
+```bash
+node tests/index.js
+```
+
+Run specific test:
+```bash
+node tests/route-matching.test.js
+```
+
+Tests cover:
+- Route matching and parameter extraction
+- Path normalization and base path handling
+- Middleware pipeline execution
+- Navigation context and lifecycle hooks
+
+---
+
 ## License
 
 MIT
