@@ -20,21 +20,20 @@ If you open the files directly with `file://`, demos that use `history` mode wil
 
 ## What these demos cover
 
-Implemented demos:
+All implemented demos:
 
-* `01-basic-routing` - the smallest setup for route registration, link interception, and initial URL sync
-* `02-dynamic-params` - dynamic route matching with params such as `/user/:id`
-* `03-lifecycle-visualizer` - full lifecycle visualization for `onArrive`, `onMeet`, `onReturn`, `onExit`, and `onComeback`
-* `04-guards-blocking` - route guard behavior for unsaved changes and blocked navigation
-* `06-end-route` - terminal route behavior for mobile-like push navigation and browser back handling
-* `07-bottom-sheet` - route-driven UI state for a bottom-sheet interaction
-
-Scaffolded folders:
-
-* `05-hash-vs-history` - planned for comparing navigation modes
-* `06-modal-route` - still available as a separate scaffold for modal route patterns
-* `08-multi-step-flow` - planned for step-based flows
-* `09-middleware` - planned for middleware orchestration
+* `01-basic-routing` - demonstrates the minimal setup for route registration, link interception, and initial URL synchronization with the router
+* `02-dynamic-params` - shows dynamic route matching with parameters like `/user/:id`, including programmatic navigation and param extraction
+* `03-lifecycle-visualizer` - provides a visual timeline of the full route lifecycle hooks: `onArrive`, `onMeet`, `onReturn`, `onExit`, and `onComeback` for different navigation types
+* `04-guards-blocking` - illustrates route guard behavior with `canLeave` for preventing navigation on unsaved changes, including blocking browser back
+* `05-hash-vs-history` - compares the differences between hash mode (`#/path`) and history mode (`/path`) routing, including their server requirements
+* `06-end-route` - demonstrates terminal routes with `end: true` for mobile-like navigation where a route acts as the flow boundary, affecting browser back behavior
+* `07-modal-route` - shows modal-based navigation where routes control modal dialog state, with proper focus management and overlay handling
+* `08-bottom-sheet` - demonstrates route-driven bottom-sheet UI state management, where navigation controls the sheet's visibility and interaction
+* `09-multi-step-flow` - illustrates multi-step navigation flows with step validation and progress tracking, using routes to manage flow state
+* `10-middleware` - demonstrates middleware usage for request processing, logging, and cross-cutting concerns like authentication or analytics
+* `11-lazy-loading` - shows lazy loading of route handlers or components on demand, improving initial load performance
+* `12-html-fetch-navigation` - demonstrates dynamic HTML content fetching and navigation, simulating single-page app behavior with server-rendered content
 
 ## Common pattern used in the demos
 
@@ -78,6 +77,46 @@ It shows:
 * `push` and `replace` entering a route through `onArrive -> onMeet`
 * `pop` leaving the current route through `onReturn -> onExit`
 * `pop` re-activating the target route through `onComeback -> onMeet`
+
+## Middleware demo note
+
+`10-middleware` shows how middleware functions are executed in a pipeline before route handling.
+
+It demonstrates:
+
+* registering middleware with `history.use()`
+* middleware receiving context and `next()` for continuation
+* logging and preprocessing requests before they reach route handlers
+
+## Multi-step flow demo note
+
+`09-multi-step-flow` illustrates complex navigation flows with validation and state management.
+
+It shows:
+
+* managing step progression with route-based state
+* preventing invalid transitions using guards
+* maintaining flow context across navigation
+
+## Lazy loading demo note
+
+`11-lazy-loading` demonstrates on-demand loading of route handlers to improve performance.
+
+It covers:
+
+* registering routes with lazy-loaded handlers
+* loading components or modules asynchronously
+* handling loading states during navigation
+
+## HTML fetch navigation demo note
+
+`12-html-fetch-navigation` simulates traditional server navigation in a single-page app context.
+
+It demonstrates:
+
+* fetching HTML content from routes
+* updating the DOM with fetched content
+* maintaining navigation state with dynamic content
 
 ## Notes
 

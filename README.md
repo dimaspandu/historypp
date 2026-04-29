@@ -100,6 +100,8 @@ Available demos:
 * `/examples/08-bottom-sheet` - route-driven bottom-sheet interaction
 * `/examples/09-multi-step-flow` - demonstrates multi-step navigation flows
 * `/examples/10-middleware` - shows how to use middleware in routing
+* `/examples/11-lazy-loading` - demonstrates lazy loading of route handlers
+* `/examples/12-html-fetch-navigation` - shows dynamic HTML content fetching and navigation
 
 ---
 

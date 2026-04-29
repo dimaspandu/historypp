@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.5.0] - 2026-04-29
+
+### Added
+- Added lazy loading example:
+  - `examples/11-lazy-loading`
+- Added HTML fetch navigation example:
+  - `examples/12-html-fetch-navigation`
+
+### Changed
+- Updated example index to include the new demos
+- Updated examples README with detailed explanations for all 12 examples
+- Updated main README to document the new examples
+
+### Notes
+- This release adds advanced routing patterns including lazy loading and dynamic content fetching, completing the example suite
+
+---
+
 ## [1.4.0] - 2026-04-29
 
 ### Added

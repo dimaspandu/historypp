@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HTML Fetch Navigation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #f5f5f5; }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: white;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 16px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    #view {
+      flex: 1;
+      padding: 20px;
+    }
+
+    nav {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    nav a {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      text-decoration: none;
+      color: #333;
+      cursor: pointer;
+    }
+
+    nav a.active {
+      background: #f0f0f0;
+      font-weight: bold;
+    }
+
+    .loading {
+      color: #888;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h3>HTML Fetch Navigation</h3>
+  </header>
+
+  <div id="view"></div>
+
+  <nav>
+    <a href="/" data-link>Home</a>
+    <a href="/about" data-link>About</a>
+    <a href="/contact" data-link>Contact</a>
+  </nav>
+</div>
+
+<script src="../../src/index.js"></script>
+<script>
+  const view = document.getElementById("view");
+
+  history.config({
+    base: "/examples/12-html-fetch-navigation"
+  });
+
+  // ==============================
+  // LINK INTERCEPTION
+  // ==============================
+
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("[data-link]");
+    if (!a) return;
+
+    e.preventDefault();
+    history.navigatePush(a.getAttribute("href"));
+  });
+
+  // ==============================
+  // UI HELPERS
+  // ==============================
+
+  function setActive(path) {
+    document.querySelectorAll("nav a").forEach(a => {
+      a.classList.toggle("active", a.getAttribute("href") === path);
+    });
+  }
+
+  function loading() {
+    view.innerHTML = `<p class="loading">Loading HTML...</p>`;
+  }
+
+  async function loadHTML(path) {
+    loading();
+
+    const res = await fetch(`./views${path === "/" ? "/home" : path}.html`);
+    const html = await res.text();
+
+    view.innerHTML = html;
+  }
+
+  // ==============================
+  // ROUTES
+  // ==============================
+
+  history.router("/", {
+    async onMeet() {
+      setActive("/");
+      await loadHTML("/");
+    }
+  });
+
+  history.router("/about", {
+    async onMeet() {
+      setActive("/about");
+      await loadHTML("/about");
+    }
+  });
+
+  history.router("/contact", {
+    async onMeet() {
+      setActive("/contact");
+      await loadHTML("/contact");
+    }
+  });
+
+  // ==============================
+  // INITIAL
+  // ==============================
+
+  history.navigateReplace(location.pathname);
+</script>
+
+</body>
+</html>
