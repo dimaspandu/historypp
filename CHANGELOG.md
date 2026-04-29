@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.3.0] - 2026-04-29
+
+### Added
+- Added hash vs history mode comparison example:
+  - `examples/05-hash-vs-history`
+- Added modal route example:
+  - `examples/07-modal-route`
+- Renamed bottom sheet example to:
+  - `examples/08-bottom-sheet`
+
+### Changed
+- Updated example index to include the new demos
+- Updated README to document the new examples
+
+### Notes
+- This release adds examples demonstrating routing modes comparison and modal-based navigation flows
+
+---
+
 ## [1.2.0] - 2026-04-28
 
 ### Added

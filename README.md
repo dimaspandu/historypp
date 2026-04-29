@@ -94,10 +94,10 @@ Available demos:
 * `/examples/02-dynamic-params` - dynamic path segments such as `/user/:id`
 * `/examples/03-lifecycle-visualizer` - visualizes the full lifecycle flow for push, replace, and pop
 * `/examples/04-guards-blocking` - demonstrates `canLeave` and blocked navigation flows
+* `/examples/05-hash-vs-history` - compares hash mode vs history mode routing
 * `/examples/06-end-route` - demonstrates terminal routes in mobile-like push navigation
-* `/examples/07-bottom-sheet` - route-driven bottom-sheet interaction
-
-More scenario folders already exist under `examples/` as scaffolding.
+* `/examples/07-modal-route` - demonstrates modal-based route navigation
+* `/examples/08-bottom-sheet` - route-driven bottom-sheet interaction
 
 ---
 
