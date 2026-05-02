@@ -102,6 +102,8 @@ Available demos:
 * `/examples/10-middleware` - shows how to use middleware in routing
 * `/examples/11-lazy-loading` - demonstrates lazy loading of route handlers
 * `/examples/12-html-fetch-navigation` - shows dynamic HTML content fetching and navigation
+* `/examples/13-html-hybrid-navigation` - demonstrates hybrid HTML fragment and SPA navigation
+* `/examples/14-route-performance` - benchmarks different route matching algorithms
 
 ---
 
@@ -393,6 +395,24 @@ Multi-entry or SSR:
 ```
 
 ---
+
+## Performance Features
+
+### Route Caching
+The router includes intelligent caching to speed up route matching:
+
+```js
+history.config({
+  matcher: "trie" // Uses trie-based matching for complex routes
+});
+```
+
+### Precompiled Routes
+Dynamic routes are precompiled for faster parameter extraction and matching.
+
+### Available Matchers
+- `"simple"` - Basic string matching (default)
+- `"trie"` - Advanced trie-based matching for high-performance applications
 
 ## Design Principles
 

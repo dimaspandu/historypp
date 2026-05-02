@@ -34,6 +34,8 @@ All implemented demos:
 * `10-middleware` - demonstrates middleware usage for request processing, logging, and cross-cutting concerns like authentication or analytics
 * `11-lazy-loading` - shows lazy loading of route handlers or components on demand, improving initial load performance
 * `12-html-fetch-navigation` - demonstrates dynamic HTML content fetching and navigation, simulating single-page app behavior with server-rendered content
+* `13-html-hybrid-navigation` - combines traditional HTML fragment loading with modern SPA routing for hybrid applications
+* `14-route-performance` - benchmarks route matching performance, comparing different matching algorithms and caching strategies
 
 ## Common pattern used in the demos
 
@@ -117,6 +119,26 @@ It demonstrates:
 * fetching HTML content from routes
 * updating the DOM with fetched content
 * maintaining navigation state with dynamic content
+
+## HTML hybrid navigation demo note
+
+`13-html-hybrid-navigation` shows a hybrid approach combining traditional HTML navigation with modern SPA routing.
+
+It demonstrates:
+
+* loading HTML fragments for different routes
+* maintaining SPA-like navigation behavior
+* transitioning between server-rendered and client-rendered content
+
+## Route performance demo note
+
+`14-route-performance` benchmarks the performance characteristics of different route matching strategies.
+
+It demonstrates:
+
+* comparing simple vs trie-based route matching
+* measuring route registration and lookup performance
+* visualizing the impact of route caching and precompilation
 
 ## Notes
 

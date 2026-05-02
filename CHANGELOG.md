@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.7.0] - 2026-05-02
+
+### Added
+- Core upgrade to v1.0.2 with performance optimizations:
+  - Route cache (memoization) for faster route matching
+  - Precompiled dynamic routes for better performance
+  - Optional trie matcher for complex routing scenarios
+- Added HTML hybrid navigation example:
+  - `examples/13-html-hybrid-navigation`
+- Added route matcher performance example:
+  - `examples/14-route-performance`
+
+### Changed
+- Updated example index to include the new demos
+- Enhanced testing infrastructure with dedicated testing engine (`tests/engine.mjs`)
+- Updated README to document new performance features and examples
+
+### Notes
+- This release focuses on performance improvements and advanced navigation patterns
+
+---
+
 ## [1.6.0] - 2026-04-29
 
 ### Added
