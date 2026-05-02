@@ -1,8 +1,3 @@
-// ==============================
-// Test Runner
-// Run all tests: node tests/index.js
-// ==============================
-
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -16,17 +11,17 @@ function runTest(file) {
   try {
     execSync(`node ${file}`, { stdio: 'inherit' });
     console.log(`${file} passed`);
-  } catch (error) {
+  } catch {
     console.log(`${file} failed`);
     process.exit(1);
   }
 }
 
 function main() {
-  const testDir = path.join(__dirname);
-  const testFiles = fs.readdirSync(testDir)
+  const testFiles = fs.readdirSync(__dirname)
     .filter(file => file.endsWith('.test.js'))
-    .map(file => path.join(testDir, file));
+    .sort()
+    .map(file => path.join(__dirname, file));
 
   console.log('Starting test suite...\n');
 
@@ -34,9 +29,7 @@ function main() {
     runTest(file);
   }
 
-  console.log('\nAll tests completed successfully! 🎉');
+  console.log('\nAll tests completed successfully!');
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main();
-}
+main();

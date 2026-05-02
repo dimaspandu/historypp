@@ -14,9 +14,10 @@ const mimeTypes = {
   ".css": "text/css",
 };
 
-/**
- * Serve static file
- */
+// ==============================
+// SERVE FILE
+// ==============================
+
 function serveFile(res, filePath) {
   if (!existsSync(filePath)) {
     res.writeHead(404);
@@ -31,9 +32,10 @@ function serveFile(res, filePath) {
   createReadStream(filePath).pipe(res);
 }
 
-/**
- * Find nearest index.html by walking up directories
- */
+// ==============================
+// FIND NEAREST INDEX (SPA fallback)
+// ==============================
+
 function findNearestIndex(baseDir, urlPath) {
   let currentPath = join(baseDir, urlPath);
 
@@ -46,7 +48,6 @@ function findNearestIndex(baseDir, urlPath) {
 
     const parent = dirname(currentPath);
 
-    // stop when reaching project root
     if (parent === currentPath || parent === baseDir) {
       break;
     }
@@ -56,6 +57,10 @@ function findNearestIndex(baseDir, urlPath) {
 
   return null;
 }
+
+// ==============================
+// SERVER
+// ==============================
 
 createServer((req, res) => {
   let urlPath = req.url.split("?")[0];
@@ -72,21 +77,31 @@ createServer((req, res) => {
   const filePath = join(__dirname, urlPath);
 
   // =========================
-  // STATIC FILE
+  // 1. DIRECT STATIC FILE
   // =========================
   if (existsSync(filePath) && !statSync(filePath).isDirectory()) {
     return serveFile(res, filePath);
   }
 
   // =========================
-  // DIRECTORY → index.html
+  // 2. DIRECTORY → index.html
   // =========================
   if (existsSync(filePath) && statSync(filePath).isDirectory()) {
     return serveFile(res, join(filePath, "index.html"));
   }
 
   // =========================
-  // SMART SPA FALLBACK
+  // 3. HTML ROUTE SUPPORT (NEW)
+  // /about → /about.html
+  // =========================
+  const htmlFile = join(__dirname, urlPath + ".html");
+
+  if (existsSync(htmlFile)) {
+    return serveFile(res, htmlFile);
+  }
+
+  // =========================
+  // 4. SMART SPA FALLBACK
   // =========================
   if (urlPath.startsWith("/examples/")) {
     const found = findNearestIndex(__dirname, urlPath);

@@ -6,30 +6,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    body { margin: 0; font-family: sans-serif; background: #f5f5f5; }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #f5f5f5;
+    }
+
+    /* ==============================
+       APP CONTAINER
+    ============================== */
 
     .app {
-      max-width: 480px;
-      margin: 0 auto;
-      min-height: 100vh;
-      background: white;
       display: flex;
       flex-direction: column;
+      height: 100vh;
+
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+
+      background: white;
+      border-left: 1px solid #ddd;
+      border-right: 1px solid #ddd;
     }
+
+    @media (max-width: 480px) {
+      .app { border: none; }
+    }
+
+    /* ==============================
+       HEADER
+    ============================== */
 
     header {
       padding: 16px;
       border-bottom: 1px solid #ddd;
     }
 
+    /* ==============================
+       VIEW
+    ============================== */
+
     #view {
       flex: 1;
       padding: 20px;
+      overflow-y: auto;
     }
+
+    /* ==============================
+       NAV
+    ============================== */
 
     nav {
       display: flex;
       border-top: 1px solid #ddd;
+      background: white;
     }
 
     nav a {
@@ -38,7 +71,7 @@
       padding: 12px;
       text-decoration: none;
       color: #333;
-      cursor: pointer;
+      font-size: 14px;
     }
 
     nav a.active {
@@ -46,9 +79,18 @@
       font-weight: bold;
     }
 
-    .loading {
-      color: #888;
+    /* ==============================
+       LOADING + ERROR
+    ============================== */
+
+    .loading,
+    .error {
       font-size: 14px;
+      color: #666;
+    }
+
+    .error {
+      color: #c62828;
     }
   </style>
 </head>
@@ -72,8 +114,15 @@
 <script>
   const view = document.getElementById("view");
 
+  // ==============================
+  // CONFIG
+  // ==============================
+
+  const BASE = "/examples/12-html-fetch-navigation";
+
   history.config({
-    base: "/examples/12-html-fetch-navigation"
+    base: BASE,
+    mode: "history"
   });
 
   // ==============================
@@ -81,15 +130,19 @@
   // ==============================
 
   document.addEventListener("click", (e) => {
-    const a = e.target.closest("[data-link]");
-    if (!a) return;
+    const link = e.target.closest("[data-link]");
+    if (!link) return;
+
+    const url = new URL(link.href);
+
+    if (url.origin !== location.origin) return;
 
     e.preventDefault();
-    history.navigatePush(a.getAttribute("href"));
+    history.navigatePush(url.pathname);
   });
 
   // ==============================
-  // UI HELPERS
+  // HELPERS
   // ==============================
 
   function setActive(path) {
@@ -98,17 +151,51 @@
     });
   }
 
-  function loading() {
-    view.innerHTML = `<p class="loading">Loading HTML...</p>`;
+  function renderLoading() {
+    view.innerHTML = `<p class="loading">Loading...</p>`;
+  }
+
+  function renderError(message = "Failed to load content") {
+    view.innerHTML = `<p class="error">${message}</p>`;
+  }
+
+  function resolveView(path) {
+    return path === "/"
+      ? `${BASE}/views/home.html`
+      : `${BASE}/views${path}.html`;
   }
 
   async function loadHTML(path) {
-    loading();
+    renderLoading();
 
-    const res = await fetch(`./views${path === "/" ? "/home" : path}.html`);
-    const html = await res.text();
+    try {
+      const res = await fetch(resolveView(path));
 
-    view.innerHTML = html;
+      if (!res.ok) {
+        renderError();
+        return;
+      }
+
+      const html = await res.text();
+
+      // Parse fragment safely
+      const temp = document.createElement("div");
+      temp.innerHTML = html;
+
+      const root = temp.firstElementChild;
+
+      // Title sync (if provided)
+      const title = root?.dataset?.title;
+      if (title) {
+        document.title = title;
+      }
+
+      view.innerHTML = html;
+
+    } catch (err) {
+      console.error(err);
+      renderError("Network error");
+    }
   }
 
   // ==============================
@@ -137,10 +224,10 @@
   });
 
   // ==============================
-  // INITIAL
+  // INITIAL SYNC
   // ==============================
 
-  history.navigateReplace(location.pathname);
+  history.navigateReplace(location.pathname + location.search);
 </script>
 
 </body>
