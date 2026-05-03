@@ -1,11 +1,12 @@
 // ==============================
 // History++ Core (Pure ESM for testing)
-// Based on v1.0.2
+// Based on v1.0.3
 // ==============================
 
 export function createEngine() {
   let routes = [];
   let current = null;
+  let notFoundHandler = null;
 
   let CONFIG = {
     base: "",
@@ -16,19 +17,17 @@ export function createEngine() {
   let routeCache = Object.create(null);
   const trieRoot = {};
 
-  // ==============================
-  // CONFIG
-  // ==============================
-
   function config(options = {}) {
     CONFIG.base = options.base || "";
     CONFIG.mode = options.mode || "history";
     CONFIG.matcher = options.matcher || "simple";
   }
 
-  // ==============================
-  // PATH UTILS
-  // ==============================
+  function notFound(handler) {
+    if (typeof handler === "function") {
+      notFoundHandler = handler;
+    }
+  }
 
   function normalizePath(path) {
     if (!path) return "/";
@@ -43,10 +42,6 @@ export function createEngine() {
     }
     return path;
   }
-
-  // ==============================
-  // ROUTE COMPILER
-  // ==============================
 
   function compileRoute(path, handler = {}) {
     const isDynamic = path.includes(":");
@@ -68,13 +63,9 @@ export function createEngine() {
       isDynamic,
       keys,
       regex,
-      handler
+      onMeet: handler?.onMeet || null
     };
   }
-
-  // ==============================
-  // TRIE
-  // ==============================
 
   function addToTrie(route) {
     const parts = route.path.split("/").filter(Boolean);
@@ -114,10 +105,6 @@ export function createEngine() {
     return { route: node.route, params };
   }
 
-  // ==============================
-  // SIMPLE MATCHER
-  // ==============================
-
   function matchSimple(path) {
     path = normalizePath(path);
 
@@ -150,10 +137,6 @@ export function createEngine() {
       : matchSimple(path);
   }
 
-  // ==============================
-  // ROUTER API
-  // ==============================
-
   function router(path, handler = {}) {
     const compiled = compileRoute(normalizePath(path), handler);
 
@@ -166,38 +149,40 @@ export function createEngine() {
     routeCache = Object.create(null);
   }
 
-  // ==============================
-  // NAVIGATION (PURE)
-  // ==============================
-
   function navigate(path, type = "push") {
     const cleanPath = stripBase(normalizePath(path));
     const match = matchRoute(cleanPath);
 
-    if (!match) return null;
-
     const ctx = {
       path: cleanPath,
-      params: match.params,
+      params: match?.params || {},
       from: current?.path || null,
       to: cleanPath,
       type
     };
 
+    if (!match) {
+      if (notFoundHandler) {
+        notFoundHandler(ctx);
+      }
+      return null;
+    }
+
     current = match.route;
+
+    if (match.route.onMeet) {
+      match.route.onMeet(ctx);
+    }
 
     return ctx;
   }
-
-  // ==============================
-  // EXPORT
-  // ==============================
 
   return {
     config,
     router,
     matchRoute,
     navigate,
+    notFound,
     _internal: {
       routeCache,
       trieRoot
