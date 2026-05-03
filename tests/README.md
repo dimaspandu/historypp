@@ -11,16 +11,22 @@ Run all tests:
 node tests/index.js
 ```
 
-Run individual test:
+Run specific test:
 ```bash
 node tests/route-matching.test.js
 ```
 
 ## Test Coverage
 
-- **route-matching.test.js**: Tests for path normalization, base path handling, route registration, and route matching with static and dynamic routes
-- Other test files cover additional functionality like context, guards, middleware, navigation, and Trie operations
+- Route matching and parameter extraction
+- Path normalization and base path handling
+- Middleware pipeline execution
+- Navigation context and lifecycle hooks
+- Global notFound handler
+- Enhanced navigation guards and rollback handling
 
 ## Test Framework
 
 Uses Node.js built-in `assert` module for assertions. Test results are reported to console with pass/fail indicators.
+
+The testing engine (`engine.mjs`) provides a pure ESM implementation that mirrors the main router's functionality for isolated testing.

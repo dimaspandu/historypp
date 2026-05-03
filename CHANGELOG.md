@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.8.0] - 2026-05-03
+
+### Added
+- Core upgrade to v1.0.3 with enhanced routing capabilities:
+  - Global `notFound` handler for unmatched routes
+  - Improved navigation guards and rollback handling
+  - Enhanced route caching and trie-based matching
+- Updated testing engine (`tests/engine.mjs`) to support v1.0.3 features
+- Enhanced all examples with improved mobile-responsive design and consistent styling
+
+### Changed
+- Updated core router to v1.0.3 across all examples
+- Improved example layouts with better mobile experience
+- Enhanced testing infrastructure to cover new router features
+
+### Notes
+- This release focuses on robustness and user experience improvements
+
+---
+
 ## [1.7.0] - 2026-05-02
 
 ### Added

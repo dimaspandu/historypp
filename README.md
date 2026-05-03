@@ -142,6 +142,7 @@ history.config({
 history.config(options)
 history.router(path, handler?)
 history.use(middlewareFn)
+history.notFound(handler)
 history.navigatePush(path, state?)
 history.navigateReplace(path, state?)
 history.navigatePop()
@@ -209,6 +210,20 @@ This means the route being left and the route being entered can react differentl
 | `onComeback` | When a route becomes active again through back/forward navigation |
 
 All hooks are optional.
+
+## Not Found Handler
+
+Handle unmatched routes with a global notFound handler:
+
+```js
+history.notFound((ctx) => {
+  console.log("Route not found:", ctx.path);
+  // Show 404 page or redirect
+  history.navigateReplace("/404");
+});
+```
+
+The notFound handler is called when no route matches the current path, allowing for custom 404 handling or fallbacks.
 
 ### Example
 

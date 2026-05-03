@@ -144,4 +144,6 @@ It demonstrates:
 
 The examples are intentionally framework-agnostic. They use plain HTML and direct DOM updates so the router behavior stays easy to observe.
 
+All examples now feature improved mobile-responsive design with consistent styling and better user experience across devices.
+
 For the full API and design overview, see the root [README](../README.md).
