@@ -11,7 +11,7 @@
  * - Server-side initial render (hydration)
  */
 
-function initApp(initialPath) {
+export default function initApp(initialPath) {
   const view = document.getElementById("view");
 
   const BASE = "/examples/13-html-hybrid-navigation";

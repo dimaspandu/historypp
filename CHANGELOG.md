@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.9.0] - 2026-05-06
+
+### Added
+- Core upgrade to v1.0.4 with performance and feature enhancements:
+  - Route caching (O(1) lookup after first match)
+  - Optional trie-based matcher for large route sets
+  - Global notFound handler for unmatched routes
+  - Improved navigation guard handling
+  - Pre-navigation validation before history mutation
+
+### Changed
+- Updated core import to use v1.0.4
+- Enhanced all examples with further UI improvements and consistency
+
+### Notes
+- This release focuses on performance optimizations and enhanced routing capabilities
+
+---
+
 ## [1.8.0] - 2026-05-03
 
 ### Added

@@ -126,8 +126,8 @@
     </nav>
   </div>
 
-  <script src="/src/index.js"></script>
-  <script>
+  <script type="module" src="/src/index.js"></script>
+  <script type="module">
     const view = document.getElementById("view");
 
     history.config({
@@ -209,6 +209,7 @@
 
         const input = document.getElementById("input");
         const status = document.getElementById("status");
+        console.log("input", input);
 
         input.oninput = () => {
           isDirty = true;

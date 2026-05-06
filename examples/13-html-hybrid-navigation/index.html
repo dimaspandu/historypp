@@ -28,9 +28,9 @@
   </nav>
 </div>
 
-<script src="/src/index.js"></script>
-<script src="./app.js"></script>
-<script>
+<script type="module" src="/src/index.js"></script>
+<script type="module">
+  import initApp from "./app.js";
   initApp("/");
 </script>
 
