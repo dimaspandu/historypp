@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { createEngine } from "./engine.mjs";
+import { createEngine } from "../src/1.0.5/index.mjs";
 
 function test(name, fn) {
   try {

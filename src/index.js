@@ -1,1 +1,1 @@
-import "./1.0.4/index.js";
+import "./1.0.5/index.mjs";

@@ -373,7 +373,19 @@ Behavior:
 
 ## Execution Flow
 
-The diagrams in `docs/diagrams/` describe the high-level navigation flow for push/replace and back navigation.
+The diagrams below describe the high-level navigation flow for push/replace and back navigation.
+
+### Push/Replace Navigation
+
+![Push/Replace Navigation Activity Diagram](docs/diagrams/1.0.4/push_replace-navigation-activity-diagram.png)
+
+![Push/Replace Navigation Sequence Diagram](docs/diagrams/1.0.4/push_replace-navigation-sequence-diagram.png)
+
+### Back Navigation
+
+![Back Navigation Activity Diagram](docs/diagrams/1.0.4/back-navigation-activity-diagram.png)
+
+![Back Navigation Sequence Diagram](docs/diagrams/1.0.4/back-navigation-sequence-diagram.png)
 
 ---
 
@@ -458,6 +470,9 @@ Tests cover:
 - Path normalization and base path handling
 - Middleware pipeline execution
 - Navigation context and lifecycle hooks
+- Global notFound handler
+- Enhanced navigation guards and rollback handling
+- Route caching and trie-based matching
 
 ---
 

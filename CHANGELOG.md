@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.9.1] - 2026-05-06
+
+### Changed
+- Updated root README.md to include execution flow diagrams from docs/diagrams/1.0.4
+- Enhanced documentation in examples/README.md and tests/README.md
+- Improved test coverage descriptions in README files
+
+### Notes
+- This release focuses on documentation improvements and better user guidance
+
+---
+
 ## [1.9.0] - 2026-05-06
 
 ### Added

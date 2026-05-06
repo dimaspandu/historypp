@@ -29,4 +29,4 @@ node tests/route-matching.test.js
 
 Uses Node.js built-in `assert` module for assertions. Test results are reported to console with pass/fail indicators.
 
-The testing engine (`engine.mjs`) provides a pure ESM implementation that mirrors the main router's functionality for isolated testing.
+The tests directly import the modular ESM implementation from `src/1.0.5/index.mjs` for isolated testing.
