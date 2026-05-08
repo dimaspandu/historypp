@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.9.2] - 2026-05-08
+
+### Changed
+- Core upgrade to v1.0.5 with enhanced testing capabilities and Node.js compatibility
+- Added package.json with "type": "module" for proper ESM support
+- Updated diagram references in README.md to version 1.0.5
+- Corrected import path in tests README.md
+
+### Notes
+- This release includes internal refactoring for better module handling and documentation updates
+
+---
+
 ## [1.9.1] - 2026-05-06
 
 ### Changed
