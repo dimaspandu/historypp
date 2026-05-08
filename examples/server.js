@@ -72,10 +72,25 @@ createServer((req, res) => {
   // ROOT
   // =========================
   if (urlPath === "/") {
-    return serveFile(res, join(__dirname, "examples/index.html"));
+    return serveFile(res, join(__dirname, "index.html"));
   }
 
-  const filePath = join(__dirname, urlPath);
+  // =========================
+  // STRIP /examples PREFIX since server is in examples/
+  // =========================
+  if (urlPath.startsWith("/examples/")) {
+    urlPath = urlPath.slice("/examples".length);
+    if (urlPath === "") urlPath = "/";
+  }
+
+  let filePath = join(__dirname, urlPath);
+
+  // =========================
+  // SPECIAL: /src/ -> ../src/
+  // =========================
+  if (urlPath.startsWith("/src/")) {
+    filePath = join(__dirname, "..", urlPath.slice(1));
+  }
 
   // =========================
   // 1. DIRECT STATIC FILE
@@ -102,9 +117,9 @@ createServer((req, res) => {
   }
 
   // =========================
-  // 4. SMART SPA FALLBACK
+  // 4. SMART SPA FALLBACK (for nested routes)
   // =========================
-  if (urlPath.startsWith("/examples/")) {
+  if (urlPath.startsWith("/")) {
     const found = findNearestIndex(__dirname, urlPath);
 
     if (found) {

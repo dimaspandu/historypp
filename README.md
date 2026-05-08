@@ -27,7 +27,7 @@ The router acts as an orchestration layer and does not handle rendering for you.
 This project includes a minimal Node.js server for running the examples:
 
 ```bash
-node server.js
+node examples/server.js
 ```
 
 Then open:
