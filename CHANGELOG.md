@@ -4,11 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [2.0.1] - 2026-05-13
+## [2.0.2] - 2026-05-13
 
 ### Added
 - Added SEO-friendly meta tags and Open Graph meta tags to root index.html for better search engine optimization and social media sharing
 - Added _redirects file for Netlify SPA deployment support to handle client-side routing refreshes
+- Added assets/featured-image.png for Open Graph image
+
+### Changed
+- Moved favicon.svg to assets/favicon.svg for better asset organization
+- Updated all example HTML files to reference the new favicon path in assets/
 
 ---
 
