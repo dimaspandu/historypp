@@ -4,6 +4,61 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.0] - 2026-05-12
+
+### Added
+- Introduced fully modular ESM-based router architecture (`src/1.0.5`)
+- Added separated internal modules for:
+  - core state
+  - navigation
+  - route matching
+  - middleware pipeline
+  - browser event handling
+  - utilities
+- Added reusable matcher modules:
+  - `simple-matcher.mjs`
+  - `trie-matcher.mjs`
+  - `match-route.mjs`
+- Added reusable navigation modules:
+  - `run.mjs`
+  - `guards.mjs`
+  - `navigation.mjs`
+- Added reusable middleware runner module:
+  - `run-middlewares.mjs`
+- Added reusable utility modules:
+  - `path.mjs`
+  - `query.mjs`
+- Added reusable browser adapter module:
+  - `browser/events.mjs`
+- Added root landing page (`/index.html`) for project showcase and hosting
+- Added redesigned examples landing page with responsive card-based UI
+- Added improved project server architecture with root-level `server.js`
+
+### Changed
+- Core router API now uses `historypp.*` instead of patching native `window.history`
+- Migrated examples toward ESM module usage
+- Refactored routing engine into composable modules for improved maintainability
+- Improved browser navigation rollback handling for blocked `popstate` transitions
+- Enhanced route lifecycle orchestration flow
+- Updated server routing behavior to better support:
+  - nested SPA routes
+  - HTML hybrid navigation
+  - fragment fetching
+  - deep-link refresh handling
+
+### Fixed
+- Fixed blocked browser back navigation causing broken history stacks
+- Fixed rollback behavior when `canLeave()` rejects `popstate` navigation
+- Fixed route refresh issues on nested paths ending with trailing slashes
+- Fixed HTML fragment loading issues in hybrid navigation examples
+
+### Notes
+- This release represents the largest architectural refactor since the initial prototype.
+- The router is now structured for long-term scalability, isolated unit testing, future adapters, and potential npm distribution.
+- Native `window.history` is no longer monkey-patched in the new ESM architecture.
+
+---
+
 ## [1.9.2] - 2026-05-08
 
 ### Changed

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>History++</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="./favicon.svg"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    .hero {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      padding: 40px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 42px;
+    }
+
+    .tagline {
+      font-size: 18px;
+      color: #666;
+      line-height: 1.6;
+      max-width: 700px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 12px 18px;
+
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 14px;
+
+      border: 1px solid #ddd;
+
+      background: white;
+      color: #222;
+    }
+
+    .btn.primary {
+      background: black;
+      color: white;
+      border-color: black;
+    }
+
+    .section {
+      margin-top: 32px;
+    }
+
+    .section h2 {
+      margin-bottom: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .card p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .card a {
+      display: inline-block;
+      margin-top: 16px;
+      text-decoration: none;
+      color: black;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    code {
+      background: #eee;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    footer {
+      margin-top: 48px;
+      color: #777;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <section class="hero">
+      <h1>History++</h1>
+
+      <p class="tagline">
+        A lightweight, UI-agnostic SPA navigation engine built on top of the native History API.
+      </p>
+
+      <div class="buttons">
+        <a class="btn primary" href="/examples/">
+          Open Examples
+        </a>
+
+        <a class="btn" href="https://github.com/dimaspandu/historypp">
+          GitHub
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Features</h2>
+
+      <div class="grid">
+
+        <div class="card">
+          <h3>Lifecycle-based Routing</h3>
+          <p>
+            Direction-aware route lifecycle hooks including
+            <code>onArrive</code>,
+            <code>onMeet</code>,
+            <code>onReturn</code>,
+            and <code>onComeback</code>.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Dynamic Params</h3>
+          <p>
+            Supports expressive route patterns such as
+            <code>/user/:id</code>.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Middleware</h3>
+          <p>
+            Execute middleware pipelines before lifecycle execution.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>History + Hash Mode</h3>
+          <p>
+            Works with both native history navigation and hash-based routing.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Navigation Guards</h3>
+          <p>
+            Block route transitions safely using <code>canLeave()</code>.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Trie Matcher</h3>
+          <p>
+            Optional trie-based route matcher for large route trees.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Quick Start</h2>
+
+      <div class="card">
+<pre><code>historypp.config({
+  mode: "history"
+});
+
+historypp.router("/", {
+  onMeet() {
+    console.log("Home");
+  }
+});
+
+historypp.navigateReplace(location.pathname);</code></pre>
+      </div>
+    </section>
+
+    <footer>
+      History++ v1.0.5
+    </footer>
+
+  </div>
+
+</body>
+</html>
