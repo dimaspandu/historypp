@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.1] - 2026-05-13
+
+### Added
+- Added SEO-friendly meta tags and Open Graph meta tags to root index.html for better search engine optimization and social media sharing
+- Added _redirects file for Netlify SPA deployment support to handle client-side routing refreshes
+
+---
+
 ## [2.0.0] - 2026-05-12
 
 ### Added
