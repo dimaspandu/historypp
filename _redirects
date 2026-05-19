@@ -14,4 +14,8 @@
 /examples/14-route-performance/*  /examples/14-route-performance/index.html  200
 
 /examples/*  /examples/index.html  200
+/docs/architecture  /docs/architecture/index.html  200
+/docs/architecture/*  /docs/architecture/index.html  200
+/docs  /docs/index.html  200
+/docs/*  /docs/index.html  200
 /*    /index.html   200

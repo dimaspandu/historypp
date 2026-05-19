@@ -147,7 +147,10 @@ createServer((req, res) => {
   // SMART SPA FALLBACK
   // =========================
 
-  if (urlPath.startsWith("/examples/")) {
+  if (
+    urlPath.startsWith("/examples/") ||
+    urlPath.startsWith("/docs/")
+  ) {
 
     const found = findNearestIndex(
       __dirname,

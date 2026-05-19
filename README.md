@@ -4,6 +4,8 @@ A lightweight, UI-agnostic navigation engine built on top of the native History 
 
 It extends `window.history` with structured routing, direction-aware lifecycle hooks, and navigation orchestration without external dependencies.
 
+Live documentation: [historypp.digital](https://historypp.digital/)
+
 ---
 
 ## Overview
@@ -17,6 +19,19 @@ This router keeps browser-native navigation behavior intact while adding a predi
 * Route lifecycle that changes based on navigation direction
 
 The router acts as an orchestration layer and does not handle rendering for you.
+
+---
+
+## Documentation
+
+Open the documentation pages:
+
+```text
+http://localhost:5173/docs/
+http://localhost:5173/docs/architecture/
+```
+
+The architecture page explains the router's module boundaries, navigation pipeline, lifecycle order, route matching strategy, and deployment model.
 
 ---
 
@@ -36,7 +51,11 @@ Then open:
 http://localhost:5173
 ```
 
-The server opens the examples index by default.
+The server opens the landing page by default. The examples are available at:
+
+```text
+http://localhost:5173/examples/
+```
 
 ---
 
@@ -377,15 +396,15 @@ The diagrams below describe the high-level navigation flow for push/replace and 
 
 ### Push/Replace Navigation
 
-![Push/Replace Navigation Activity Diagram](docs/diagrams/1.0.5/push_replace-navigation-activity-diagram.png)
+![Push/Replace Navigation Activity Diagram](docs/architecture/push_replace-navigation-activity-diagram.png)
 
-![Push/Replace Navigation Sequence Diagram](docs/diagrams/1.0.5/push_replace-navigation-sequence-diagram.png)
+![Push/Replace Navigation Sequence Diagram](docs/architecture/push_replace-navigation-sequence-diagram.png)
 
 ### Back Navigation
 
-![Back Navigation Activity Diagram](docs/diagrams/1.0.5/back-navigation-activity-diagram.png)
+![Back Navigation Activity Diagram](docs/architecture/back-navigation-activity-diagram.png)
 
-![Back Navigation Sequence Diagram](docs/diagrams/1.0.5/back-navigation-sequence-diagram.png)
+![Back Navigation Sequence Diagram](docs/architecture/back-navigation-sequence-diagram.png)
 
 ---
 

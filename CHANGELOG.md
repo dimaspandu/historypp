@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.4] - 2026-05-19
+
+### Added
+- Added simplified documentation pages for project docs and architecture.
+- Added fullscreen diagram previews on the architecture documentation page.
+- Added the live documentation link to the README.
+
+### Changed
+- Redesigned the root landing page with a simpler documentation-style layout.
+- Increased typography sizes across the landing page, architecture docs, and examples index for better readability.
+- Updated docs and examples routing support for local preview and Netlify deployment.
+- Moved architecture diagrams into the architecture documentation folder.
+
+### Fixed
+- Updated README server instructions to match the current landing-page default.
+- Updated README diagram references to the current architecture documentation paths.
+
+---
+
 ## [2.0.3] - 2026-05-19
 
 ### Changed
