@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.3] - 2026-05-19
+
+### Changed
+- Updated example module script paths to load `/src/index.js` from the site root.
+- Reordered Netlify redirects so nested example routes are handled before the root SPA fallback.
+
+### Fixed
+- Fixed local server path resolution for root-relative asset and module requests.
+- Prevented file requests with extensions from falling back to HTML responses.
+
+---
+
 ## [2.0.2] - 2026-05-13
 
 ### Added

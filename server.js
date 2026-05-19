@@ -93,7 +93,8 @@ createServer((req, res) => {
     );
   }
 
-  const filePath = join(__dirname, urlPath);
+  const cleanPath = urlPath.replace(/^\/+/, "");
+  const filePath = join(__dirname, cleanPath);
 
   // =========================
   // DIRECT STATIC FILE
@@ -126,11 +127,20 @@ createServer((req, res) => {
 
   const htmlFile = join(
     __dirname,
-    urlPath + ".html"
+    cleanPath + ".html"
   );
 
   if (existsSync(htmlFile)) {
     return serveFile(res, htmlFile);
+  }
+
+  // If the request has a file extension (e.g. .js, .css, .map) do not fall back to index.html
+  // This prevents serving HTML for module/script requests and avoids MIME type errors.
+  const requestExt = extname(urlPath);
+  if (requestExt) {
+    res.writeHead(404);
+    res.end("Not found");
+    return;
   }
 
   // =========================
@@ -141,7 +151,7 @@ createServer((req, res) => {
 
     const found = findNearestIndex(
       __dirname,
-      urlPath
+      cleanPath
     );
 
     if (found) {

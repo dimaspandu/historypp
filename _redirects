@@ -1,6 +1,3 @@
-/*    /index.html   200
-
-/examples/*  /examples/index.html  200
 /examples/01-basic-routing/*  /examples/01-basic-routing/index.html  200
 /examples/02-dynamic-params/*  /examples/02-dynamic-params/index.html  200
 /examples/03-lifecycle-visualizer/*  /examples/03-lifecycle-visualizer/index.html  200
@@ -15,3 +12,6 @@
 /examples/12-html-fetch-navigation/*  /examples/12-html-fetch-navigation/index.html  200
 /examples/13-html-hybrid-navigation/*  /examples/13-html-hybrid-navigation/index.html  200
 /examples/14-route-performance/*  /examples/14-route-performance/index.html  200
+
+/examples/*  /examples/index.html  200
+/*    /index.html   200
