@@ -207,6 +207,41 @@
       height: auto;
     }
 
+    .code-snapshot {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #171717;
+      box-shadow: var(--shadow);
+    }
+
+    .code-title {
+      margin: 0;
+      padding: 18px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f1f1f1;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      padding: 24px;
+      color: #f5f5f5;
+      font-size: 17px;
+      line-height: 1.65;
+      tab-size: 2;
+    }
+
+    code {
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+    }
+
     .example-group {
       margin-top: 28px;
     }
@@ -305,10 +340,10 @@
       <div class="section-head">
         <h2>Philosophy</h2>
         <p>
-          History++ extends native browser history with small chainable APIs while preserving direct access to browser URLs and navigation behavior.
+          History++ keeps browser-native navigation behavior intact while adding predictable route lifecycle orchestration.
         </p>
         <p class="note">
-          No rendering ownership. No virtual DOM. No framework lock-in.
+          The URL stays the source of truth. Routes describe UI state. Your application keeps control of rendering.
         </p>
       </div>
 
@@ -330,23 +365,27 @@
 
     <section>
       <div class="section-head">
-        <h2>What History++ Is Not</h2>
-        <p>History++ intentionally avoids common framework responsibilities.</p>
+        <h2>Basic Usage Snapshot</h2>
+        <p>
+          Register routes, attach lifecycle handlers, then sync the current browser URL into the router on first load.
+        </p>
       </div>
 
-      <div class="grid">
-        <article class="card">
-          <h3>No Virtual DOM</h3>
-          <p>It does not diff or reconcile UI trees. It only coordinates navigation behavior.</p>
-        </article>
-        <article class="card">
-          <h3>No Compiler</h3>
-          <p>There is no build-time route transform, JSX compiler, or template pipeline.</p>
-        </article>
-        <article class="card">
-          <h3>No Rendering Runtime</h3>
-          <p>Your application remains responsible for rendering and component structure.</p>
-        </article>
+      <div class="code-snapshot">
+        <p class="code-title">Route registration and initial URL sync</p>
+<pre><code>history.router("/", {
+  onMeet() {
+    console.log("Home");
+  }
+});
+
+history.router("/about", {
+  onMeet() {
+    console.log("About");
+  }
+});
+
+history.navigateReplace(location.pathname + location.search);</code></pre>
       </div>
     </section>
 
@@ -475,7 +514,7 @@
   <footer>
     Built on top of native browser APIs and predictable route lifecycle.
     <br />
-    <code>No rendering ownership. No framework required.</code>
+    <code>URL-driven state. Native back/forward support.</code>
   </footer>
 </body>
 </html>

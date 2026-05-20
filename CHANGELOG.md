@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.5] - 2026-05-20
+
+### Changed
+- Aligned the landing page copy with the README project description.
+- Replaced unrelated framework-oriented messaging with URL-driven routing and lifecycle language.
+- Added a basic route registration code snapshot to the landing page.
+
+---
+
 ## [2.0.4] - 2026-05-19
 
 ### Added
