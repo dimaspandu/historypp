@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.6] - 2026-09-30
+
+### Added
+- Added a `.gitignore` covering editor directories (`.vscode/`, `.idea/`) and AI agent tooling folders (`.kilo/`, `.claude/`, `.cursor/`, `.opencode/`, `.codex/`, `.agents/`, `.gemini/`, `.windsurf/`, `.continue/`), plus `node_modules/`, build output, logs, and environment files.
+
+### Removed
+- Removed the local `.kilo/` agent workspace directory from the repository.
+- Removed the local `.vscode/` editor configuration directory from the repository.
+
+---
+
 ## [2.0.5] - 2026-05-20
 
 ### Changed
