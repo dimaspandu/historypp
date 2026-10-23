@@ -191,6 +191,16 @@
           const nextId = Number(id) + 1;
           history.navigatePush(`/user/${nextId}`);
         };
+
+        // True only on the first successful route match of the session.
+        // Useful for isomorphic rendering: when the server already rendered
+        // the DOM for the initial URL, the client only needs to attach
+        // events instead of fetching + rendering again.
+        if (ctx.isInitialRoute) {
+          console.log("Initial load — server-rendered DOM is already present");
+        } else {
+          console.log("Client-side navigation — fetch data and render");
+        }
       }
     });
 

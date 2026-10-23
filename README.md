@@ -274,13 +274,13 @@ Each lifecycle hook receives:
 
 ```js
 {
-  path,   // normalized matched path, without base
-  params, // dynamic params
-  query,  // parsed query string object
-  state,
-  from,   // previous route path
-  to,     // target route path
-  type    // "push" | "replace" | "pop"
+  path,         // normalized matched path, without base
+  params,       // dynamic params
+  query,        // parsed query string object
+  isInitialRoute, // true only on the first successful match of the session
+  from,         // previous route path
+  to,           // target route path
+  type          // "push" | "replace" | "pop"
 }
 ```
 
@@ -289,6 +289,7 @@ Useful details:
 * `ctx.params` is filled when the route contains dynamic segments
 * `ctx.query` is parsed from the URL search string
 * `ctx.type` tells you whether the transition came from push, replace, or pop
+* `ctx.isInitialRoute` is true only for the very first successful route match. Useful for isomorphic rendering: when the server already rendered the initial view, the client only needs to attach events instead of fetching data again. It is `false` on every subsequent navigation, including back/forward.
 
 ---
 

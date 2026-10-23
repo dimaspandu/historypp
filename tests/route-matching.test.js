@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { createEngine } from "../src/1.0.5/index.js";
+import { createEngine } from "../src/1.0.6/index.js";
 
 function test(name, fn) {
   try {
@@ -84,4 +84,64 @@ test("NotFound handler is triggered", () => {
   r.navigate("/unknown");
 
   assert.equal(called, true);
+});
+
+test("ctx.isInitialRoute is true only on first successful match", () => {
+  const r = createEngine();
+
+  const captured = [];
+
+  r.router("/user/:id", {
+    onMeet(ctx) {
+      captured.push(ctx);
+    }
+  });
+
+  r.navigate("/user/5");
+
+  assert.equal(captured.length, 1);
+  assert.equal(captured[0].isInitialRoute, true);
+
+  r.navigate("/user/42");
+
+  assert.equal(captured.length, 2);
+  assert.equal(captured[1].isInitialRoute, false);
+});
+
+test("ctx.isInitialRoute is false on not-found", () => {
+  const r = createEngine();
+
+  let captured;
+
+  r.router("/user/:id");
+
+  r.notFound((ctx) => {
+    captured = ctx;
+  });
+
+  r.navigate("/unknown");
+
+  assert.equal(captured.isInitialRoute, false);
+});
+
+test("ctx.isInitialRoute is not reset by later navigation", () => {
+  const r = createEngine();
+
+  const captured = [];
+
+  r.router("/user/:id", {
+    onMeet(ctx) {
+      captured.push(ctx);
+    }
+  });
+
+  r.navigate("/user/5");
+
+  assert.equal(captured.length, 1);
+  assert.equal(captured[0].isInitialRoute, true);
+
+  r.navigate("/user/5"); // same path again
+
+  assert.equal(captured.length, 2);
+  assert.equal(captured[1].isInitialRoute, false);
 });

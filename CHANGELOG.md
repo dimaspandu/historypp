@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.7] - 2026-10-23
+
+### Added
+- `ctx.isInitialRoute` flag on the navigation context. It is `true` only for the very first successful route match of the session, letting lifecycle hooks distinguish an initial (server-rendered) load from subsequent client-side navigation.
+
+### Changed
+- Router core bumped to version 1.0.6 (`src/1.0.6/`).
+
+---
+
 ## [2.0.6] - 2026-09-30
 
 ### Added
