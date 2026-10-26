@@ -64,11 +64,19 @@ test("Cache works (same reference)", () => {
 test("Navigation context", () => {
   const r = createEngine();
 
-  r.router("/a");
+  let ctx;
 
-  const ctx = r.navigate("/a");
+  r.router("/a", {
+    onMeet(c) {
+      ctx = c;
+    }
+  });
+
+  r.navigate("/a");
 
   assert.equal(ctx.path, "/a");
+  assert.equal(ctx.firstArrive, true);
+  assert.equal(ctx.isInitialRoute, true);
 });
 
 test("NotFound handler is triggered", () => {
@@ -79,6 +87,8 @@ test("NotFound handler is triggered", () => {
   r.notFound((ctx) => {
     called = true;
     assert.equal(ctx.path, "/unknown");
+    assert.equal(ctx.firstArrive, true);
+    assert.equal(ctx.isInitialRoute, false);
   });
 
   r.navigate("/unknown");
@@ -86,7 +96,7 @@ test("NotFound handler is triggered", () => {
   assert.equal(called, true);
 });
 
-test("ctx.isInitialRoute is true only on first successful match", () => {
+test("ctx.firstArrive is one-shot", () => {
   const r = createEngine();
 
   const captured = [];
@@ -99,32 +109,14 @@ test("ctx.isInitialRoute is true only on first successful match", () => {
 
   r.navigate("/user/5");
 
-  assert.equal(captured.length, 1);
-  assert.equal(captured[0].isInitialRoute, true);
+  assert.equal(captured[0].firstArrive, true);
 
   r.navigate("/user/42");
 
-  assert.equal(captured.length, 2);
-  assert.equal(captured[1].isInitialRoute, false);
+  assert.equal(captured[1].firstArrive, false);
 });
 
-test("ctx.isInitialRoute is false on not-found", () => {
-  const r = createEngine();
-
-  let captured;
-
-  r.router("/user/:id");
-
-  r.notFound((ctx) => {
-    captured = ctx;
-  });
-
-  r.navigate("/unknown");
-
-  assert.equal(captured.isInitialRoute, false);
-});
-
-test("ctx.isInitialRoute is not reset by later navigation", () => {
+test("ctx.isInitialRoute is persistent for the initial route pattern", () => {
   const r = createEngine();
 
   const captured = [];
@@ -135,13 +127,54 @@ test("ctx.isInitialRoute is not reset by later navigation", () => {
     }
   });
 
+  r.router("/about", {
+    onMeet(ctx) {
+      captured.push(ctx);
+    }
+  });
+
   r.navigate("/user/5");
 
   assert.equal(captured.length, 1);
+  assert.equal(captured[0].firstArrive, true);
   assert.equal(captured[0].isInitialRoute, true);
 
-  r.navigate("/user/5"); // same path again
+  r.navigate("/about");
 
   assert.equal(captured.length, 2);
+  assert.equal(captured[1].firstArrive, false);
   assert.equal(captured[1].isInitialRoute, false);
+
+  // Return to the initial pattern (simulating back/forward).
+  // DOM may have been overwritten, so firstArrive is false and forces
+  // a fetch + re-render, even though isInitialRoute is still true.
+  r.navigate("/user/5");
+
+  assert.equal(captured.length, 3);
+  assert.equal(captured[2].firstArrive, false);
+  assert.equal(captured[2].isInitialRoute, true);
+});
+
+test("initial URL not-found does not stamp the next match as initial", () => {
+  const r = createEngine();
+
+  const captured = [];
+
+  r.router("/user/:id", {
+    onMeet(ctx) {
+      captured.push(ctx);
+    }
+  });
+
+  r.notFound((ctx) => {
+    assert.equal(ctx.firstArrive, true);
+    assert.equal(ctx.isInitialRoute, false);
+  });
+
+  r.navigate("/unknown");
+  r.navigate("/user/5");
+
+  assert.equal(captured.length, 1);
+  assert.equal(captured[0].firstArrive, false);
+  assert.equal(captured[0].isInitialRoute, false);
 });

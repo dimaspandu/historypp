@@ -192,11 +192,12 @@
           history.navigatePush(`/user/${nextId}`);
         };
 
-        // True only on the first successful route match of the session.
-        // Useful for isomorphic rendering: when the server already rendered
-        // the DOM for the initial URL, the client only needs to attach
-        // events instead of fetching + rendering again.
-        if (ctx.isInitialRoute) {
+        // Combine both flags: the server already rendered this DOM only
+        // on the very first visit to the initial route. On a later return
+        // to the same pattern (e.g. back/forward) the DOM may have been
+        // overwritten by another route, so firstArrive being false forces
+        // a fetch + re-render.
+        if (ctx.firstArrive && ctx.isInitialRoute) {
           console.log("Initial load — server-rendered DOM is already present");
         } else {
           console.log("Client-side navigation — fetch data and render");

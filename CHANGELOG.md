@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.8] - 2026-10-26
+
+### Added
+- `ctx.firstArrive` flag: true only on the very first `run()` call of the session (one-shot, true even when that first call is a not-found).
+- `ctx.isInitialRoute` flag: true when the matched route is the one that handled the initial URL. Persistent — stays true every time the same pattern is visited again (e.g. back/forward), even though `ctx.firstArrive` will be false on those returns.
+
+### Changed
+- Router core bumped to engine v1.0.6 (`src/1.0.6`).
+- `ctx.firstArrive` and `ctx.isInitialRoute` are now kept as separate concepts so lifecycle hooks can combine them correctly for isomorphic rendering (`ctx.firstArrive && ctx.isInitialRoute`).
+
+---
+
 ## [2.0.7] - 2026-10-23
 
 ### Added
