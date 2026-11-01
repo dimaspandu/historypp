@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.10] - 2026-11-01
+
+### Added
+- Exposed npm scripts: `npm run test` (runs `node tests/index.js`) and `npm run dev` (runs `node server.js`).
+
+---
+
 ## [2.0.9] - 2026-11-01
 
 ### Changed
