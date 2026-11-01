@@ -1,7 +1,36 @@
 {
-  "name": "historypp",
-  "version": "2.0.8",
+  "name": "historyplusplus",
+  "version": "2.0.9",
+  "description": "A lightweight, UI-agnostic SPA navigation engine built on top of the native History API.",
   "type": "module",
+  "license": "MIT",
+  "author": "dimaspandu",
+  "keywords": [
+    "router",
+    "history",
+    "spa",
+    "navigation",
+    "history-api",
+    "routing"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dimaspandu/historypp.git"
+  },
+  "homepage": "https://historypp.digital/",
+  "exports": {
+    ".": "./src/1.0.6/index.js",
+    "./1.0.6": "./src/1.0.6/index.js"
+  },
+  "main": "./src/1.0.6/index.js",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "test": "node tests/index.js",
     "dev": "node server.js"
