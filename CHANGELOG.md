@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.9] - 2026-11-01
+
+### Changed
+- Package homepage set to `https://historypp.digital/`.
+- Published to npm as `historyplusplus`.
+
+---
+
 ## [2.0.8] - 2026-10-26
 
 ### Added
