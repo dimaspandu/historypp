@@ -46,8 +46,8 @@ npm install historyplusplus
 ```js
 import { VERSION, createEngine } from "historyplusplus";
 
-const router = createEngine();
-router.router("/user/:id", {
+const history = createEngine();
+history.router("/user/:id", {
   onMeet(ctx) {
     if (ctx.firstArrive && ctx.isInitialRoute) {
       // server-rendered, attach events only
@@ -56,7 +56,7 @@ router.router("/user/:id", {
     }
   }
 });
-router.navigate("/user/5");
+history.navigate("/user/5");
 ```
 
 In the browser, include the module directly:

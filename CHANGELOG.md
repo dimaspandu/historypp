@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.12] - 2026-11-01
+
+### Documentation
+- README: fixed redundant `router.router` call in the npm install example — now uses `const history = createEngine();` and `history.router(...)`.
+
+---
+
 ## [2.0.11] - 2026-11-01
 
 ### Documentation
