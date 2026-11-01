@@ -37,12 +37,42 @@ The architecture page explains the router's module boundaries, navigation pipeli
 
 ## Getting Started
 
+### Install from npm
+
+```bash
+npm install historyplusplus
+```
+
+```js
+import { VERSION, createEngine } from "historyplusplus";
+
+const router = createEngine();
+router.router("/user/:id", {
+  onMeet(ctx) {
+    if (ctx.firstArrive && ctx.isInitialRoute) {
+      // server-rendered, attach events only
+    } else {
+      // fetch data and render
+    }
+  }
+});
+router.navigate("/user/5");
+```
+
+In the browser, include the module directly:
+
+```html
+<script type="module" src="/src/index.js"></script>
+```
+
+This auto-injects the router into `window.historypp` and `window.history`.
+
 ### Run Local Server
 
 This project includes a minimal Node.js server for running the examples:
 
 ```bash
-node server.js
+npm run dev
 ```
 
 Then open:
@@ -480,11 +510,13 @@ Dynamic routes are precompiled for faster parameter extraction and matching.
 The project includes unit tests for the router core functionality, runnable in Node.js without DOM dependencies.
 
 Run all tests:
+
 ```bash
-node tests/index.js
+npm run test
 ```
 
-Run specific test:
+Run a specific test file:
+
 ```bash
 node tests/route-matching.test.js
 ```

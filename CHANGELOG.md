@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.11] - 2026-11-01
+
+### Documentation
+- README: added npm install instructions, `npm run dev`, and `npm run test` usage.
+
+---
+
 ## [2.0.10] - 2026-11-01
 
 ### Added
