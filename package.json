@@ -15,7 +15,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dimaspandu/historypp.git"
+    "url": "git+https://github.com/dimaspandu/historypp.git"
   },
   "homepage": "https://historypp.digital/",
   "exports": {
