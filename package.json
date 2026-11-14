@@ -1,6 +1,6 @@
 {
   "name": "historyplusplus",
-  "version": "2.0.12",
+  "version": "2.0.13",
   "description": "A lightweight, UI-agnostic SPA navigation engine built on top of the native History API.",
   "type": "module",
   "license": "MIT",
@@ -19,10 +19,11 @@
   },
   "homepage": "https://historypp.digital/",
   "exports": {
-    ".": "./src/1.0.6/index.js",
-    "./1.0.6": "./src/1.0.6/index.js"
+    ".": "./src/1.0.7/index.js",
+    "./1.0.6": "./src/1.0.6/index.js",
+    "./1.0.7": "./src/1.0.7/index.js"
   },
-  "main": "./src/1.0.6/index.js",
+  "main": "./src/1.0.7/index.js",
   "files": [
     "src",
     "README.md",

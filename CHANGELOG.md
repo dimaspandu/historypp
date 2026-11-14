@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.13] - 2026-11-14
+
+### Added
+- Router core bumped to engine v1.0.7 (`src/1.0.7`).
+- Added `ctx.isSelfNavigate`, `ctx.isSameRoute`, `ctx.isSameURL`, and `ctx.search` flags to the navigation context so route handlers and middleware can detect when `navigatePush()` or `navigateReplace()` targets the active route (including identical URLs like `/about -> /about`, query-only transitions like `/search -> /search?q=hp`, and identical dynamic params like `/user/:id -> /user/:id`).
+- Fixed trie matcher in `create-router.js` to register the complete route entry so lifecycle hooks and guards work identically in `"trie"` mode.
+- Added `examples/15-self-navigation` demonstrating self-navigation detection across static, query-only, and dynamic routes.
+- Added unit tests in `tests/self-navigation.test.js` covering self-navigation, same-route, and query-only transitions.
+
+---
+
 ## [2.0.12] - 2026-11-01
 
 ### Documentation

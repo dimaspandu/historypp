@@ -7,7 +7,7 @@ This folder contains runnable demos for `History++`. Each example isolates one n
 Start the local server from the project root:
 
 ```bash
-node server.js
+npm run dev
 ```
 
 Then open:
@@ -36,6 +36,7 @@ All implemented demos:
 * `12-html-fetch-navigation` - demonstrates dynamic HTML content fetching and navigation, simulating single-page app behavior with server-rendered content
 * `13-html-hybrid-navigation` - combines traditional HTML fragment loading with modern SPA routing for hybrid applications
 * `14-route-performance` - benchmarks route matching performance, comparing different matching algorithms and caching strategies
+* `15-self-navigation` - demonstrates detecting self-navigation (`ctx.isSelfNavigate`, `ctx.isSameRoute`, `ctx.isSameURL`) when pushing/replacing the same static route, changing query parameters on `/search`, or revisiting the same dynamic param path `/user/:id`
 
 ## Common pattern used in the demos
 

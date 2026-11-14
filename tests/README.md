@@ -8,12 +8,13 @@ The tests are written for Node.js and can run without DOM or external dependenci
 
 Run all tests:
 ```bash
-node tests/index.js
+npm run test
 ```
 
 Run specific test:
 ```bash
 node tests/route-matching.test.js
+node tests/self-navigation.test.js
 ```
 
 ## Test Coverage
@@ -24,9 +25,10 @@ node tests/route-matching.test.js
 - Navigation context and lifecycle hooks
 - Global notFound handler
 - Enhanced navigation guards and rollback handling
+- Self-navigation and same-route detection (`ctx.isSelfNavigate`, `ctx.isSameRoute`, `ctx.isSameURL`)
 
 ## Test Framework
 
 Uses Node.js built-in `assert` module for assertions. Test results are reported to console with pass/fail indicators.
 
-The tests directly import the modular ESM implementation from `src/1.0.5/index.js` for isolated testing.
+The tests directly import the modular ESM implementation from `src/1.0.7/index.js` for isolated testing.

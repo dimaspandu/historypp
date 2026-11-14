@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Self Navigation & Same Route Detection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="../../assets/favicon.svg"
+  />
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      background: white;
+      border-left: 1px solid #ddd;
+      border-right: 1px solid #ddd;
+    }
+
+    @media (max-width: 520px) {
+      .app { border: none; }
+    }
+
+    header {
+      padding: 16px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    nav {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      background: #fafafa;
+    }
+
+    nav a {
+      flex: 1;
+      text-align: center;
+      padding: 12px 6px;
+      text-decoration: none;
+      color: #333;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    nav a.active {
+      background: #e8f0fe;
+      color: #1557b0;
+      font-weight: 800;
+    }
+
+    #view {
+      flex: 1;
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .card {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      background: #fff;
+    }
+
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 17px;
+      color: #111827;
+    }
+
+    .card p {
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #1e293b;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #f1f5f9;
+    }
+
+    button.primary {
+      background: #1e293b;
+      color: white;
+      border-color: #1e293b;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    .badge-true {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-false {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .ctx-box {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .key {
+      color: #38bdf8;
+    }
+
+    .str {
+      color: #86efac;
+    }
+
+    .bool-true {
+      color: #fbbf24;
+      font-weight: bold;
+    }
+
+    .bool-false {
+      color: #94a3b8;
+    }
+
+    #log {
+      padding: 12px 18px 24px;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+      max-height: 220px;
+      overflow-y: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+    }
+
+    .log-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #334155;
+    }
+
+    .log-item {
+      padding: 4px 0;
+      border-bottom: 1px solid #e2e8f0;
+      color: #475569;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      margin-right: 4px;
+      background: #e2e8f0;
+    }
+
+    .pill-push { background: #dbeafe; color: #1e40af; }
+    .pill-replace { background: #fef3c7; color: #92400e; }
+    .pill-pop { background: #f3e8ff; color: #6b21a8; }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    <header>
+      <h1>Self Navigation Detector</h1>
+    </header>
+
+    <nav>
+      <a href="/" data-link>Home</a>
+      <a href="/about" data-link>About</a>
+      <a href="/search" data-link>Search</a>
+      <a href="/user/1" data-link>User #1</a>
+    </nav>
+
+    <div id="view"></div>
+
+    <div id="log">
+      <div class="log-title">
+        <span>Lifecycle & Context Log</span>
+        <button id="clear-log" style="padding: 2px 6px; font-size: 11px;">Clear</button>
+      </div>
+      <div id="log-entries"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/index.js"></script>
+  <script type="module">
+    const view = document.getElementById("view");
+    const logEntries = document.getElementById("log-entries");
+    const clearLogBtn = document.getElementById("clear-log");
+
+    history.config({
+      base: "/examples/15-self-navigation",
+      mode: "history"
+    });
+
+    let lastCtx = null;
+
+    clearLogBtn.addEventListener("click", () => {
+      logEntries.innerHTML = "";
+    });
+
+    function formatCtx(ctx) {
+      return JSON.stringify({
+        path: ctx.path,
+        from: ctx.from,
+        to: ctx.to,
+        type: ctx.type,
+        params: ctx.params,
+        query: ctx.query,
+        firstArrive: ctx.firstArrive,
+        isInitialRoute: ctx.isInitialRoute,
+        isSelfNavigate: ctx.isSelfNavigate,
+        isSameRoute: ctx.isSameRoute,
+        isSameURL: ctx.isSameURL
+      }, null, 2);
+    }
+
+    function logHook(routeName, hookName, ctx) {
+      lastCtx = ctx;
+      renderCurrentRoute();
+
+      const el = document.createElement("div");
+      el.className = "log-item";
+      const typeClass = `pill-${ctx.type}`;
+      el.innerHTML = `
+        <span class="pill ${typeClass}">${ctx.type}</span>
+        <strong>${routeName}.${hookName}</strong>
+        &rarr; <code>${ctx.from || "null"} -> ${ctx.to}</code>
+        ${ctx.isSelfNavigate ? '<span class="badge badge-true">isSelfNavigate: true</span>' : ''}
+      `;
+      logEntries.prepend(el);
+    }
+
+    function renderCurrentRoute() {
+      if (!lastCtx) return;
+
+      const activePath = lastCtx.path;
+      document.querySelectorAll("nav a").forEach(a => {
+        const href = a.getAttribute("href");
+        a.classList.toggle("active", href === activePath || (activePath.startsWith("/user/") && href.startsWith("/user/")));
+      });
+
+      if (lastCtx.path === "/") {
+        view.innerHTML = `
+          <div class="card">
+            <h2>Home (Cross-Route Target)</h2>
+            <p>
+              Navigate to <b>/about</b> and try clicking <b>Push /about Again</b> or <b>Change Query (?tab=docs)</b> to see <code>ctx.isSelfNavigate</code> and <code>ctx.isSameRoute</code> in action.
+            </p>
+            <div class="btn-row">
+              <button class="primary" onclick="history.navigatePush('/about')">Go to /about</button>
+              <button class="primary" onclick="history.navigatePush('/search')">Go to /search</button>
+              <button class="primary" onclick="history.navigatePush('/user/1')">Go to /user/1</button>
+            </div>
+          </div>
+          ${renderCtxPanel()}
+        `;
+      } else if (lastCtx.path === "/about") {
+        const isSelf = lastCtx.isSelfNavigate;
+        view.innerHTML = `
+          <div class="card">
+            <h2>About Page <span class="badge ${isSelf ? 'badge-true' : 'badge-false'}">isSelfNavigate: ${isSelf}</span></h2>
+            <p>
+              Test navigating to the exact same static URL <code>/about</code> via push or replace, or switching query parameters without leaving <code>/about</code>.
+            </p>
+            <div class="btn-row">
+              <button onclick="history.navigatePush('/about')">Push /about (Same URL)</button>
+              <button onclick="history.navigateReplace('/about')">Replace /about (Same URL)</button>
+              <button onclick="history.navigateReplace('/about?tab=profile')">Replace /about?tab=profile</button>
+              <button onclick="history.navigateReplace('/about?tab=settings')">Replace /about?tab=settings</button>
+            </div>
+          </div>
+          ${renderCtxPanel()}
+        `;
+      } else if (lastCtx.path === "/search") {
+        const q = lastCtx.query.q || "";
+        const isSelf = lastCtx.isSelfNavigate;
+        const isSameURL = lastCtx.isSameURL;
+
+        view.innerHTML = `
+          <div class="card">
+            <h2>Search Page <span class="badge ${isSelf ? 'badge-true' : 'badge-false'}">isSelfNavigate: ${isSelf}</span></h2>
+            <p>
+              Same route pattern (<code>/search</code>), changing only query string (<code>?q=...</code>).
+            </p>
+            <div class="btn-row">
+              <button onclick="history.navigateReplace('/search')">Clear Query (/search)</button>
+              <button onclick="history.navigateReplace('/search?q=laptop')">?q=laptop</button>
+              <button onclick="history.navigateReplace('/search?q=keyboard')">?q=keyboard</button>
+              <button onclick="history.navigateReplace('/search?q=laptop')">?q=laptop (Repeat)</button>
+            </div>
+            <div style="font-size: 13px; color: #334155;">
+              Active search query: <b>${q ? `"${q}"` : "(empty)"}</b>
+              <span class="badge ${isSameURL ? 'badge-true' : 'badge-false'}">isSameURL: ${isSameURL}</span>
+            </div>
+          </div>
+          ${renderCtxPanel()}
+        `;
+      } else if (lastCtx.path.startsWith("/user/")) {
+        const uid = lastCtx.params.id || "?";
+        const isSelf = lastCtx.isSelfNavigate;
+        const isSameURL = lastCtx.isSameURL;
+
+        view.innerHTML = `
+          <div class="card">
+            <h2>User Profile: #${uid} <span class="badge ${isSelf ? 'badge-true' : 'badge-false'}">isSelfNavigate: ${isSelf}</span></h2>
+            <p>
+              Dynamic route pattern <code>/user/:id</code>. Both <code>/user/1 &rarr; /user/1</code> and <code>/user/1 &rarr; /user/2</code> share <code>isSameRoute: true</code>, while identical URL has <code>isSameURL: true</code>.
+            </p>
+            <div class="btn-row">
+              <button onclick="history.navigatePush('/user/1')">Go /user/1</button>
+              <button onclick="history.navigatePush('/user/2')">Go /user/2</button>
+              <button onclick="history.navigatePush('/user/2')">Push /user/2 Again (Exact Same URL)</button>
+            </div>
+          </div>
+          ${renderCtxPanel()}
+        `;
+      } else {
+        view.innerHTML = `
+          <div class="card">
+            <h2>404 Not Found</h2>
+            <p>Path: <code>${lastCtx.path}</code></p>
+          </div>
+          ${renderCtxPanel()}
+        `;
+      }
+    }
+
+    function renderCtxPanel() {
+      if (!lastCtx) return "";
+      const json = formatCtx(lastCtx)
+        .replace(/&quot;/g, '"')
+        .replace(/"([^"]+)":/g, '"<span class="key">$1</span>":')
+        .replace(/: &quot;([^&]*)&quot;/g, ': <span class="str">"$1"</span>')
+        .replace(/: true/g, ': <span class="bool-true">true</span>')
+        .replace(/: false/g, ': <span class="bool-false">false</span>')
+        .replace(/: null/g, ': <span class="bool-false">null</span>');
+
+      return `
+        <div class="card">
+          <h2>Live Context (<code>ctx</code>)</h2>
+          <div class="ctx-box">${json}</div>
+        </div>
+      `;
+    }
+
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest("[data-link]");
+      if (!a) return;
+
+      const url = new URL(a.href);
+      if (url.origin !== location.origin) return;
+
+      e.preventDefault();
+      history.navigatePush(url.pathname + url.search);
+    });
+
+    history.router("/", {
+      onMeet(ctx) {
+        logHook("Home", "onMeet", ctx);
+      }
+    });
+
+    history.router("/about", {
+      onArrive(ctx) {
+        logHook("About", "onArrive", ctx);
+      },
+      onMeet(ctx) {
+        if (ctx.isSelfNavigate) {
+          console.log("[Self-Navigated on /about]", { isSelfNavigate: ctx.isSelfNavigate, isSameURL: ctx.isSameURL, tab: ctx.query.tab });
+        }
+        logHook("About", "onMeet", ctx);
+      }
+    });
+
+    history.router("/search", {
+      onArrive(ctx) {
+        logHook("Search", "onArrive", ctx);
+      },
+      onMeet(ctx) {
+        if (ctx.isSelfNavigate && !ctx.isSameURL) {
+          console.log("[Query-Only Self-Navigation on /search]", ctx.query);
+        }
+        logHook("Search", "onMeet", ctx);
+      }
+    });
+
+    history.router("/user/:id", {
+      onArrive(ctx) {
+        logHook("User", "onArrive", ctx);
+      },
+      onMeet(ctx) {
+        logHook("User(/user/" + ctx.params.id + ")", "onMeet", ctx);
+      }
+    });
+
+    history.notFound((ctx) => {
+      lastCtx = ctx;
+      logHook("NotFound", "onMeet", ctx);
+    });
+
+    history.navigateReplace(location.pathname + location.search);
+  </script>
+
+</body>
+</html>

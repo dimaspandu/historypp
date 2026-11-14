@@ -51,7 +51,7 @@ npm install
 ## Run Local Server
 
 ```bash
-node server.js
+npm run dev
 ```
 
 Open:
@@ -66,7 +66,7 @@ http://localhost:5173
 
 ```text
 src/
-  1.0.5/
+  1.0.7/
     core/
     matcher/
     middleware/

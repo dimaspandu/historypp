@@ -153,6 +153,7 @@ Available demos:
 * `/examples/12-html-fetch-navigation` - shows dynamic HTML content fetching and navigation
 * `/examples/13-html-hybrid-navigation` - demonstrates hybrid HTML fragment and SPA navigation
 * `/examples/14-route-performance` - benchmarks different route matching algorithms
+* `/examples/15-self-navigation` - detects same-route and self-navigation transitions (`ctx.isSelfNavigate`, `ctx.isSameRoute`, `ctx.isSameURL`)
 
 ---
 
@@ -304,26 +305,79 @@ Each lifecycle hook receives:
 
 ```js
 {
-  path,          // normalized matched path, without base
-  params,        // dynamic params
-  query,         // parsed query string object
-  firstArrive,   // true only on the very first run() call of the session
-  isInitialRoute, // true when the matched route handled the initial URL
-  from,          // previous route path
-  to,            // target route path
-  type           // "push" | "replace" | "pop"
+  path,            // normalized matched path, without base
+  params,          // dynamic params
+  query,           // parsed query string object
+  search,          // raw query string (without "?")
+  firstArrive,     // true only on the very first run() call of the session
+  isInitialRoute,  // true when the matched route handled the initial URL
+  isSameRoute,     // true when transitioning within the exact same matched route pattern
+  isSelfNavigate,  // true on push/replace when navigating to the currently active route
+  isSameURL,       // true when neither pathname nor query string changed
+  from,            // previous resolved route path
+  to,              // target route path
+  type             // "push" | "replace" | "pop"
 }
 ```
 
 Useful details:
 
 * `ctx.params` is filled when the route contains dynamic segments
-* `ctx.query` is parsed from the URL search string
+* `ctx.query` is parsed from the URL search string, and `ctx.search` contains the raw query string
 * `ctx.type` tells you whether the transition came from push, replace, or pop
 * `ctx.firstArrive` is one-shot: true only on the first `run()` call, then always `false`
 * `ctx.isInitialRoute` is persistent: true when the matched route is the one that handled the initial URL, and stays true every time the same pattern is visited again (e.g. back/forward)
+* `ctx.isSameRoute` is true whenever the active route pattern matches the target route pattern (`state.current === match.route`)
+* `ctx.isSelfNavigate` is true when `ctx.type` is `"push"` or `"replace"` and `ctx.isSameRoute` is `true`
+* `ctx.isSameURL` is true when `ctx.from === ctx.to` and the query string is unchanged
 
 For isomorphic rendering, combine both: `ctx.firstArrive && ctx.isInitialRoute` means the server already rendered this DOM, so the client only needs to attach events. On a later return to the same pattern the DOM may have been overwritten by another route, so `firstArrive` being `false` forces a fetch + re-render.
+
+---
+
+## Self-Navigation & Same-Route Detection
+
+Use `ctx.isSelfNavigate`, `ctx.isSameRoute`, and `ctx.isSameURL` to detect when a route navigates to itself:
+
+### 1. Query-Only Self-Navigation (`/search` -> `/search?q=hp`)
+
+```js
+history.router("/search", {
+  onMeet(ctx) {
+    if (ctx.isSelfNavigate && !ctx.isSameURL) {
+      // Same route (/search), only query changed
+      // ctx.isSelfNavigate === true
+      // ctx.isSameRoute === true
+      // ctx.isSameURL === false
+      // ctx.query === { q: "hp" }
+    }
+  }
+});
+
+history.navigateReplace("/search?q=hp");
+```
+
+### 2. Identical Static or Dynamic Route (`/about` -> `/about`, `/user/5` -> `/user/5`)
+
+```js
+history.router("/about", {
+  onMeet(ctx) {
+    if (ctx.isSelfNavigate && ctx.isSameURL) {
+      // Exact same URL pushed or replaced while already active
+    }
+  }
+});
+```
+
+| Scenario | `ctx.type` | `ctx.isSelfNavigate` | `ctx.isSameRoute` | `ctx.isSameURL` |
+| :--- | :--- | :--- | :--- | :--- |
+| `/about` -> `/about` (`push` / `replace`) | `"push"` / `"replace"` | `true` | `true` | `true` |
+| `/search` -> `/search?q=hp` (`push` / `replace`) | `"push"` / `"replace"` | `true` | `true` | `false` |
+| `/user/1` -> `/user/1` (`push` / `replace`) | `"push"` / `"replace"` | `true` | `true` | `true` |
+| `/user/1` -> `/user/2` (`push` / `replace`) | `"push"` / `"replace"` | `true` | `true` | `false` |
+| Browser Back / Forward (`popstate`) | `"pop"` | `false` | `true` | `false` |
+
+See `/examples/15-self-navigation` for an interactive demo.
 
 ---
 
@@ -519,6 +573,7 @@ Run a specific test file:
 
 ```bash
 node tests/route-matching.test.js
+node tests/self-navigation.test.js
 ```
 
 Tests cover:
@@ -529,6 +584,7 @@ Tests cover:
 - Global notFound handler
 - Enhanced navigation guards and rollback handling
 - Route caching and trie-based matching
+- Self-navigation, same-route, and query-only transitions (`ctx.isSelfNavigate`, `ctx.isSameRoute`, `ctx.isSameURL`)
 
 ---
 

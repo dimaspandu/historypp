@@ -2,7 +2,7 @@
 
 Every update (feature, bugfix, docs, chore) must follow this order:
 
-1. **Change code / docs** in `src/1.0.6/`, `examples/`, `README.md`, `CHANGELOG.md`, etc.
+1. **Change code / docs** in `src/1.0.7/`, `examples/`, `README.md`, `CHANGELOG.md`, etc.
 2. **Run tests**: `npm test` (must be 9/9 pass).
 3. **Bump `package.json` version** (e.g. `2.0.x` → `2.0.x+1`).
 4. **Update `CHANGELOG.md`** with an entry `[2.0.x] - YYYY-MM-DD` above older entries.
